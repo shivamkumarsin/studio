@@ -6,6 +6,7 @@ export interface Photo {
   src: string; // Firebase Storage URL
   name: string;
   category: string;
+  description?: string; // Optional description for the photo
   createdAt?: Timestamp; // For ordering
 }
 

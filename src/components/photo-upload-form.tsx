@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea"; // Added Textarea
 import {
   Select,
   SelectContent,
@@ -16,45 +17,61 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { Photo, Category } from "@/types";
 import { APP_CATEGORIES } from "@/types";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, FilesIcon } from "lucide-react";
 import { db, storage } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Progress } from "@/components/ui/progress";
 
-interface PhotoUploadFormProps {
-  onPhotoAdd?: (photoId: string) => void; // Optional: callback after successful upload
-}
-
-export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+export function PhotoUploadForm() {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // For single file preview
+  const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | "">(APP_CATEGORIES[0]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentTaskMessage, setCurrentTaskMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (event.target.files && event.target.files.length > 0) {
+      const filesArray = Array.from(event.target.files);
+      setSelectedFiles(filesArray);
+
+      if (filesArray.length === 1) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result as string);
+        };
+        reader.readAsDataURL(filesArray[0]);
+      } else {
+        setPreviewUrl(null); // Clear single preview if multiple files
+      }
     } else {
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setPreviewUrl(null);
+    }
+  };
+
+  const resetForm = (formElement?: HTMLFormElement) => {
+    setSelectedFiles([]);
+    setPreviewUrl(null);
+    setDescription("");
+    setSelectedCategory(APP_CATEGORIES[0]);
+    setIsUploading(false);
+    setUploadProgress(0);
+    setCurrentTaskMessage(null);
+    if (formElement) {
+      formElement.reset();
     }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedFile || !selectedCategory) {
+    if (selectedFiles.length === 0 || !selectedCategory) {
       toast({
         title: "Missing Information",
-        description: "Please select a photo and a category.",
+        description: "Please select at least one photo and a category.",
         variant: "destructive",
       });
       return;
@@ -62,148 +79,156 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
 
     setIsUploading(true);
     setUploadProgress(0);
+    let successfulUploads = 0;
+    const totalFiles = selectedFiles.length;
 
-    try {
-      const storageRef = ref(storage, `photos/${Date.now()}_${selectedFile.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+    for (let i = 0; i < totalFiles; i++) {
+      const file = selectedFiles[i];
+      setCurrentTaskMessage(`Uploading ${file.name} (${i + 1} of ${totalFiles})...`);
+      
+      try {
+        const storageRef = ref(storage, `photos/${Date.now()}_${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          let progress = 0;
-          if (snapshot.totalBytes > 0) {
-            progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
-            progress = 100;
-          }
-          setUploadProgress(progress);
-        },
-        (error) => {
-          console.error("Firebase Storage Upload Error:", error);
-          let description = "Could not upload the photo. Please try again.";
-          if (error.code) {
-            switch (error.code) {
-              case 'storage/unauthorized':
-                description = "Permission denied. Check Firebase Storage security rules and ensure your bucket is correctly configured and accessible. You might need to adjust rules in the Firebase console (Storage > Rules).";
-                break;
-              case 'storage/canceled':
-                description = "Upload canceled.";
-                break;
-              case 'storage/unknown':
-                description = "An unknown error occurred. This might be a CORS issue (check Firebase Storage CORS configuration) or an issue with the bucket configuration (verify 'storageBucket' in firebase.ts). Check console for details.";
-                break;
-              case 'storage/object-not-found':
-                 description = "File/Bucket not found. This can indicate the 'storageBucket' name in your app's firebase.ts config is incorrect or the bucket doesn't exist. Verify bucket name, its CORS configuration, and Firebase Storage Rules. Check console.";
-                 break;
-              case 'storage/quota-exceeded':
-                description = "Storage quota exceeded. You may need to upgrade your Firebase plan or free up space.";
-                break;
-              case 'storage/project-not-found':
-                description = "Firebase project not found. Verify your Firebase configuration in firebase.ts.";
-                break;
-              case 'storage/bucket-not-found':
-                description = "Storage bucket not found. Ensure the 'storageBucket' in firebase.ts is correct and the bucket exists in Google Cloud Console, and that Storage is enabled for your Firebase project. Check console.";
-                break;
-              default:
-                description = `Upload error: ${error.message}. Common issues: Firebase Storage security rules, incorrect 'storageBucket' name in firebase.ts, CORS misconfiguration, or Storage not fully enabled for the project's region. Check browser console.`;
-            }
-          }
-          toast({
-            title: "Upload Failed",
-            description: description,
-            variant: "destructive",
-          });
-          setIsUploading(false);
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            const photoDisplayName = `Amrit Kumar Chanchal - ${selectedFile.name}`;
-
-            const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
-              src: downloadURL,
-              name: photoDisplayName,
-              category: selectedCategory,
-              createdAt: serverTimestamp(),
-            };
-
-            const docRef = await addDoc(collection(db, "photos"), photoData);
-            toast({
-              title: "Photo Uploaded!",
-              description: `${photoDisplayName} added to ${selectedCategory}.`,
-              variant: "default",
-            });
-            
-            if (onPhotoAdd) {
-              onPhotoAdd(docRef.id);
-            }
-
-            setSelectedFile(null);
-            setPreviewUrl(null);
-            if (event.target instanceof HTMLFormElement) {
-              event.target.reset();
-            }
-            setSelectedCategory(APP_CATEGORIES[0]); // Reset category
-            setIsUploading(false);
-            setUploadProgress(0);
-          } catch (firestoreError) {
-             console.error("Firestore Document Creation Error:", firestoreError);
-             toast({
-                title: "Error Saving Photo Details",
-                description: "Photo uploaded, but failed to save details to database. Check console.",
+        // Simplified progress for individual file (can be enhanced later if needed)
+        // For now, we show overall batch progress.
+        
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              // This progress is for the current file, not the batch.
+              // To keep the UI simple, we're using a batch-level progress bar updated after each file.
+            },
+            (error) => {
+              console.error(`Firebase Storage Upload Error for ${file.name}:`, error);
+              let errorDescription = "Could not upload the photo. Please try again.";
+              // Simplified error handling for brevity in bulk upload
+              toast({
+                title: `Upload Failed for ${file.name}`,
+                description: errorDescription,
                 variant: "destructive",
-             });
-             setIsUploading(false);
-          }
-        }
-      );
-    } catch (error) {
-      console.error("General Error in handleSubmit for photo upload:", error);
+              });
+              reject(error); 
+            },
+            async () => {
+              try {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                const photoDisplayName = `Amrit Kumar Chanchal - ${file.name}`;
+
+                const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
+                  src: downloadURL,
+                  name: photoDisplayName,
+                  category: selectedCategory,
+                  description: description || "", // Use current description for all files in batch or clear per file
+                  createdAt: serverTimestamp(),
+                };
+
+                await addDoc(collection(db, "photos"), photoData);
+                toast({
+                  title: "Photo Uploaded!",
+                  description: `${photoDisplayName} added to ${selectedCategory}.`,
+                  variant: "default", // Changed to default for success
+                });
+                successfulUploads++;
+                resolve();
+              } catch (firestoreError) {
+                 console.error(`Firestore Error for ${file.name}:`, firestoreError);
+                 toast({
+                    title: `Error Saving ${file.name} Details`,
+                    description: "Photo uploaded, but failed to save details. Check console.",
+                    variant: "destructive",
+                 });
+                 reject(firestoreError);
+              }
+            }
+          );
+        });
+        setUploadProgress(((i + 1) / totalFiles) * 100);
+      } catch (error) {
+        // Error already handled by toast in uploadTask's error callback
+        // We can decide if we want to stop the batch or continue
+        setCurrentTaskMessage(`Failed to upload ${file.name}. Continuing with next if any.`);
+        // Continue to next file
+      }
+    }
+
+    setCurrentTaskMessage(null);
+    if (successfulUploads > 0) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred during upload. Check console, Firebase Storage security rules, bucket name config (firebase.ts), and CORS settings.",
+        title: "Batch Upload Complete",
+        description: `${successfulUploads} of ${totalFiles} photos uploaded successfully.`,
+      });
+    } else if (totalFiles > 0) {
+       toast({
+        title: "Batch Upload Failed",
+        description: `No photos were uploaded successfully. Check individual errors.`,
         variant: "destructive",
       });
-      setIsUploading(false);
     }
+    
+    resetForm(event.target as HTMLFormElement);
   };
 
   return (
     <Card className="w-full max-w-md shadow-lg">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2">
-          <UploadCloud className="text-primary" /> Add New Photo
+          <UploadCloud className="text-primary" /> Add New Photo(s)
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="photo-upload" className="font-body text-md">Photo</Label>
+            <Label htmlFor="photo-upload" className="font-body text-md">Photo(s)</Label>
             <Input
               id="photo-upload"
               type="file"
               accept="image/*"
               onChange={handleFileChange}
               className="file:text-primary-foreground file:bg-primary hover:file:bg-primary/90"
-              required
+              required={selectedFiles.length === 0} // Required if no files are selected yet
               disabled={isUploading}
+              multiple // Allow multiple file selection
             />
           </div>
 
-          {previewUrl && !isUploading && (
-            <div className="mt-4">
-              <img src={previewUrl} alt="Preview" className="max-h-48 w-auto rounded-md object-cover mx-auto shadow-md" />
-            </div>
+          {isUploading && currentTaskMessage && (
+            <p className="text-sm text-muted-foreground text-center">{currentTaskMessage}</p>
           )}
-          
           {isUploading && (
             <div className="space-y-2 mt-4">
-              <Label className="font-body text-md">Upload Progress</Label>
+              <Label className="font-body text-md">Overall Upload Progress</Label>
               <Progress value={uploadProgress} className="w-full" />
               <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
             </div>
           )}
 
+          {!isUploading && selectedFiles.length === 1 && previewUrl && (
+            <div className="mt-4">
+              <img src={previewUrl} alt="Preview" className="max-h-48 w-auto rounded-md object-cover mx-auto shadow-md" />
+            </div>
+          )}
+          {!isUploading && selectedFiles.length > 1 && (
+            <div className="mt-4 p-3 border rounded-md text-center bg-muted/50">
+              <FilesIcon className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">{selectedFiles.length} files selected.</p>
+              <p className="text-xs text-muted-foreground">The description below will apply to all selected photos.</p>
+            </div>
+          )}
+
+
+          <div className="space-y-2">
+            <Label htmlFor="description" className="font-body text-md">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Tell a story about this photo/these photos..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[100px]"
+              disabled={isUploading}
+            />
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="category-select" className="font-body text-md">Category</Label>
@@ -229,9 +254,9 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           <Button 
             type="submit" 
             className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-body text-lg py-3"
-            disabled={isUploading || !selectedFile}
+            disabled={isUploading || selectedFiles.length === 0}
           >
-            {isUploading ? "Uploading..." : "Upload Photo"}
+            {isUploading ? "Uploading..." : `Upload ${selectedFiles.length > 0 ? selectedFiles.length + ' Photo(s)' : 'Photo(s)'}`}
           </Button>
         </form>
       </CardContent>
