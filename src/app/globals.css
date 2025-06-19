@@ -21,13 +21,13 @@ body {
     --popover-foreground: 255 255 255; /* Pure white text */
 
     --primary: 59 130 246; /* Professional blue */
-    --primary-foreground: 0 0 0;
+    --primary-foreground: 0 0 0; /* Black text on blue */
 
     --secondary: 30 30 30; /* Dark grey */
     --secondary-foreground: 255 255 255; /* Pure white text */
 
-    --muted: 25 25 25;
-    --muted-foreground: 255 255 255; /* Changed to pure white */
+    --muted: 25 25 25; /* Dark background */
+    --muted-foreground: 255 255 255; /* Pure white text */
 
     --accent: 37 99 235; /* Deeper blue accent */
     --accent-foreground: 255 255 255; /* Pure white text */
@@ -36,7 +36,7 @@ body {
     --destructive-foreground: 255 255 255; /* Pure white text */
 
     --border: 40 40 40;
-    --input: 30 30 30;
+    --input: 30 30 30; /* Dark input background */
     --ring: 59 130 246;
 
     --chart-1: 59 130 246;
@@ -65,17 +65,17 @@ body {
     --popover: 20 20 20;
     --popover-foreground: 255 255 255; /* Pure white text */
     --primary: 59 130 246;
-    --primary-foreground: 0 0 0;
+    --primary-foreground: 0 0 0; /* Black text on blue */
     --secondary: 30 30 30;
     --secondary-foreground: 255 255 255; /* Pure white text */
-    --muted: 25 25 25;
-    --muted-foreground: 255 255 255; /* Changed to pure white */
+    --muted: 25 25 25; /* Dark background */
+    --muted-foreground: 255 255 255; /* Pure white text */
     --accent: 37 99 235;
     --accent-foreground: 255 255 255; /* Pure white text */
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255; /* Pure white text */
     --border: 40 40 40;
-    --input: 30 30 30;
+    --input: 30 30 30; /* Dark input background */
     --ring: 59 130 246;
 
     --chart-1: 59 130 246;
@@ -139,8 +139,26 @@ body {
   }
 
   /* Force white text on all elements */
-  h1, h2, h3, h4, h5, h6, p, span, div, a, button, label, input, textarea {
+  h1, h2, h3, h4, h5, h6, p, span, div, a, button, label, input, textarea, li, td, th {
     color: #ffffff !important;
+  }
+
+  /* Ensure primary text stays blue */
+  .text-primary {
+    color: rgb(59 130 246) !important;
+  }
+
+  .text-accent {
+    color: rgb(37 99 235) !important;
+  }
+
+  /* Black text only on primary/accent backgrounds */
+  .bg-primary, .bg-primary\\/90, .bg-primary\\/80 {
+    color: #000000 !important;
+  }
+
+  .bg-accent, .bg-accent\\/90, .bg-accent\\/80 {
+    color: #000000 !important;
   }
 
   /* Override muted text to be white */
@@ -159,13 +177,33 @@ body {
     color: #ffffff !important;
   }
 
-  /* Button text overrides */
-  .text-primary {
-    color: rgb(59 130 246) !important;
+  /* Ensure destructive text is visible */
+  .text-destructive {
+    color: rgb(239 68 68) !important;
   }
 
-  .text-accent {
-    color: rgb(37 99 235) !important;
+  /* Fix button text colors */
+  button {
+    color: #ffffff !important;
+  }
+
+  button.bg-primary, button.bg-primary\\/90, button.bg-primary\\/80 {
+    color: #000000 !important;
+  }
+
+  button.bg-accent, button.bg-accent\\/90, button.bg-accent\\/80 {
+    color: #000000 !important;
+  }
+
+  /* Fix input and form elements */
+  input, textarea, select {
+    background-color: rgba(30, 30, 30, 1) !important;
+    color: #ffffff !important;
+    border-color: rgba(40, 40, 40, 1) !important;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
   }
 }
 
@@ -243,14 +281,15 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* Enhanced glass morphism effect */
+/* Enhanced glass morphism effect - ensure dark background */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.7) !important; /* Dark background */
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(59, 130, 246, 0.2);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #ffffff !important; /* Ensure white text */
 }
 
 /* Professional grid pattern */
@@ -394,7 +433,7 @@ body {
   50% { background-position: 100% 50%; }
 }
 
-/* Ensure all text elements are white */
+/* Ensure all text elements are white by default */
 * {
   color: #ffffff;
 }
@@ -407,4 +446,63 @@ body {
 .text-slate-400,
 .text-slate-600 {
   color: #ffffff !important;
+}
+
+/* Fix specific UI components */
+.bg-white, .bg-white\\/10, .bg-white\\/20 {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  color: #ffffff !important;
+}
+
+/* Ensure modal/dialog backgrounds are dark */
+[role="dialog"], .dialog-content {
+  background-color: rgba(15, 15, 15, 1) !important;
+  color: #ffffff !important;
+}
+
+/* Fix any remaining white backgrounds */
+.bg-background {
+  background-color: rgba(0, 0, 0, 1) !important;
+}
+
+.bg-card {
+  background-color: rgba(15, 15, 15, 1) !important;
+}
+
+.bg-muted {
+  background-color: rgba(25, 25, 25, 1) !important;
+}
+
+/* Ensure buttons with primary/accent backgrounds have black text */
+.bg-primary * {
+  color: #000000 !important;
+}
+
+.bg-accent * {
+  color: #000000 !important;
+}
+
+/* Fix any remaining visibility issues */
+.opacity-0 {
+  opacity: 0 !important;
+}
+
+.opacity-100 {
+  opacity: 1 !important;
+}
+
+/* Ensure proper contrast for all interactive elements */
+button:not(.bg-primary):not(.bg-accent) {
+  color: #ffffff !important;
+}
+
+a:not(.bg-primary):not(.bg-accent) {
+  color: #ffffff !important;
+}
+
+/* Fix form elements */
+.form-control, .form-input {
+  background-color: rgba(30, 30, 30, 1) !important;
+  color: #ffffff !important;
+  border-color: rgba(40, 40, 40, 1) !important;
 }
