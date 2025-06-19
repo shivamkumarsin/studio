@@ -144,9 +144,6 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-12">
-      {/* Site Appearance Settings section removed */}
-      {/* <Separator /> // This separator can also be removed if it was only for the settings section */}
-
       <div className="grid md:grid-cols-3 gap-8">
         <section aria-labelledby="upload-section-title" className="md:col-span-1">
           <div className="sticky top-24"> 

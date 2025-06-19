@@ -23,8 +23,10 @@ export type Category = typeof APP_CATEGORIES[number];
 
 export const ALL_CATEGORIES_OPTION = "All Categories";
 
-export interface SiteSettings {
-  profilePhotoUrl?: string;
-  heroBackdropUrl?: string;
-  updatedAt?: Timestamp;
-}
+// SiteSettings interface is no longer needed as the functionality
+// for managing these settings via admin panel has been removed.
+// export interface SiteSettings {
+//   profilePhotoUrl?: string;
+//   heroBackdropUrl?: string;
+//   updatedAt?: Timestamp;
+// }
