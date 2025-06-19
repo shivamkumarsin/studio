@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyB2rJ-09fvNF6G36s8FoWyMqaEQpkCPOjI",
   authDomain: "amrit-website.firebaseapp.com",
   projectId: "amrit-website",
-  storageBucket: "amrit-website.appspot.com", // Standard Firebase bucket name. Verify in your Firebase console.
+  storageBucket: "amrit-website.firebasestorage.app", // Updated to match user's confirmed bucket name
   messagingSenderId: "356146249369",
   appId: "1:356146249369:web:3f09b6f869bb05e1ea8208",
   measurementId: "G-HCSLW22K9S"
@@ -30,7 +30,7 @@ const db = getFirestore(app);
 // Initialize Firebase Storage.
 // The storageBucket from firebaseConfig will be used.
 // Ensure Firebase Storage is enabled in your new Firebase project and
-// the bucket name matches (typically 'YOUR_PROJECT_ID.appspot.com').
+// the bucket name matches.
 const storage = getStorage(app);
 
 // Initialize Firebase Analytics if supported
