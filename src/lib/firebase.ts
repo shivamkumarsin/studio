@@ -8,10 +8,10 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyChq9jz28OYnd3Qdr0SZhyluQduZXiBmVs",
+  apiKey: "AIzaSyAApR4OBm5hLC6Q-urGmCwNStoX-hmgLcI", // User-provided API key
   authDomain: "blog-website-amrit.firebaseapp.com",
   projectId: "blog-website-amrit",
-  storageBucket: "blog-website-amrit.appspot.com", // Canonical bucket name
+  storageBucket: "blog-website-amrit.appspot.com", // Standard convention, user MUST VERIFY this in Google Cloud Console
   messagingSenderId: "708646374643",
   appId: "1:708646374643:web:4a8f52174b839c4e07bb86",
   measurementId: "G-Z11K61P6JX"
