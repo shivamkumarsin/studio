@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyChq9jz28OYnd3Qdr0SZhyluQduZXiBmVs",
   authDomain: "blog-website-amrit.firebaseapp.com",
   projectId: "blog-website-amrit",
-  storageBucket: "blog-website-amrit.firebasestorage.app", // Reverted to your originally provided value. Please VERIFY this in your Firebase Console.
+  storageBucket: "blog-website-amrit.appspot.com", // Canonical bucket name
   messagingSenderId: "708646374643",
   appId: "1:708646374643:web:4a8f52174b839c4e07bb86",
   measurementId: "G-Z11K61P6JX"
