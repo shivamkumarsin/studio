@@ -7,18 +7,18 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CategoryFilter } from "@/components/category-filter";
 import { PhotoGrid } from "@/components/photo-grid";
-import type { Photo, Category, SiteSettings } from "@/types";
+import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Camera, Mail, Star, ChevronDown, UserCircle } from "lucide-react";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, limit, doc, getDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { WeeklyHighlights } from "@/components/weekly-highlights";
 
-const DEFAULT_HERO_IMAGE = "https://placehold.co/1920x1080.png";
-const DEFAULT_PROFILE_IMAGE = "https://placehold.co/400x400.png";
+const HERO_BACKDROP_IMAGE_URL = "https://placehold.co/1920x1080.png";
+const PROFILE_IMAGE_URL = "https://certify.amritkumarchanchal.me/amrit-kumar-chanchal.png";
 
 
 export default function PublicHomePage() {
@@ -29,37 +29,7 @@ export default function PublicHomePage() {
   const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
   const { toast } = useToast();
 
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({});
-  const [isLoadingSiteSettings, setIsLoadingSiteSettings] = useState(true);
-
-
   useEffect(() => {
-    // Fetch site settings
-    const fetchSiteSettings = async () => {
-      setIsLoadingSiteSettings(true);
-      try {
-        const settingsDocRef = doc(db, "settings", "siteAppearance");
-        const docSnap = await getDoc(settingsDocRef);
-        if (docSnap.exists()) {
-          setSiteSettings(docSnap.data() as SiteSettings);
-        } else {
-          console.log("No site settings document found, using defaults.");
-          setSiteSettings({ heroBackdropUrl: DEFAULT_HERO_IMAGE, profilePhotoUrl: DEFAULT_PROFILE_IMAGE });
-        }
-      } catch (error: any) {
-        console.error("Error fetching site settings:", error);
-        toast({
-          title: "Error loading site visuals",
-          description: `Could not load some site visual elements. Defaulting to placeholders. Error: ${error.message}`,
-          variant: "destructive"
-        });
-        setSiteSettings({ heroBackdropUrl: DEFAULT_HERO_IMAGE, profilePhotoUrl: DEFAULT_PROFILE_IMAGE });
-      } finally {
-        setIsLoadingSiteSettings(false);
-      }
-    };
-    fetchSiteSettings();
-
     setIsLoading(true);
     const photosCollection = collection(db, "photos");
     const q = query(photosCollection, orderBy("createdAt", "desc"));
@@ -131,9 +101,6 @@ export default function PublicHomePage() {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const currentHeroImageUrl = siteSettings.heroBackdropUrl || DEFAULT_HERO_IMAGE;
-  const currentProfileImageUrl = siteSettings.profilePhotoUrl || DEFAULT_PROFILE_IMAGE;
-
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="bg-card text-card-foreground py-4 shadow-md sticky top-0 z-50">
@@ -169,19 +136,15 @@ export default function PublicHomePage() {
         className="relative py-24 md:py-40 text-center overflow-hidden bg-gradient-to-br from-background via-card to-secondary"
       >
         <div className="absolute inset-0 opacity-5 md:opacity-10 z-0">
-          {isLoadingSiteSettings ? (
-             <div className="w-full h-full bg-muted animate-pulse" />
-          ) : (
-            <Image
-              src={currentHeroImageUrl}
-              alt="Hero backdrop for Amrit's Photo Stack"
-              fill
-              sizes="100vw"
-              priority
-              className="pointer-events-none object-cover"
-              data-ai-hint="abstract dark texture"
-            />
-          )}
+          <Image
+            src={HERO_BACKDROP_IMAGE_URL}
+            alt="Hero backdrop for Amrit's Photo Stack"
+            fill
+            sizes="100vw"
+            priority
+            className="pointer-events-none object-cover"
+            data-ai-hint="abstract dark texture"
+          />
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <motion.h1
@@ -250,18 +213,14 @@ export default function PublicHomePage() {
             className="flex flex-col md:flex-row items-center gap-8 md:gap-12"
           >
             <div className="md:w-1/3 flex-shrink-0">
-              {isLoadingSiteSettings ? (
-                <div className="w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-muted rounded-lg shadow-xl mx-auto animate-pulse" />
-              ) : (
-                <Image 
-                  src={currentProfileImageUrl} 
-                  alt="Portrait of Amrit Kumar Chanchal, photographer"
-                  width={400}
-                  height={400}
-                  className="rounded-lg shadow-xl mx-auto object-cover aspect-square"
-                  data-ai-hint="photographer portrait"
-                />
-              )}
+              <Image 
+                src={PROFILE_IMAGE_URL} 
+                alt="Portrait of Amrit Kumar Chanchal, photographer"
+                width={400}
+                height={400}
+                className="rounded-lg shadow-xl mx-auto object-cover aspect-square"
+                data-ai-hint="photographer portrait"
+              />
             </div>
             <div className="md:w-2/3 text-center md:text-left">
               <h3 className="text-2xl font-headline text-foreground mb-4">Amrit Kumar Chanchal</h3>

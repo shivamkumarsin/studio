@@ -10,13 +10,12 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, ShieldAlert, Settings } from "lucide-react";
+import { Wifi, WifiOff, ShieldAlert } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc, getCountFromServer } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { useAuth } from "@/contexts/auth-context";
-import { SiteSettingsForm } from "@/components/site-settings-form"; // Import new component
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
@@ -145,16 +144,8 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-12">
-      <section aria-labelledby="site-settings-title">
-        <h2 id="site-settings-title" className="text-2xl font-headline font-semibold mb-4 pb-2 border-b flex items-center gap-2">
-          <Settings className="h-6 w-6 text-primary" /> Site Appearance Settings
-        </h2>
-        <div className="max-w-2xl mx-auto">
-         <SiteSettingsForm />
-        </div>
-      </section>
-
-      <Separator />
+      {/* Site Appearance Settings section removed */}
+      {/* <Separator /> // This separator can also be removed if it was only for the settings section */}
 
       <div className="grid md:grid-cols-3 gap-8">
         <section aria-labelledby="upload-section-title" className="md:col-span-1">
