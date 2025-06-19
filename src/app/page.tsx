@@ -19,7 +19,7 @@ import { WeeklyHighlights } from "@/components/weekly-highlights";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 
-const HERO_BACKDROP_IMAGE_URL = "https://placehold.co/1920x1080.png";
+const HERO_BACKDROP_IMAGE_URL = "https://cdn.pixabay.com/photo/2017/11/02/09/16/christmas-2910468_1280.jpg";
 const PROFILE_IMAGE_URL = "https://certify.amritkumarchanchal.me/amrit-kumar-chanchal.png";
 
 
@@ -158,7 +158,7 @@ export default function PublicHomePage() {
             sizes="100vw"
             priority
             className="pointer-events-none object-cover"
-            data-ai-hint="hand stars gold"
+            data-ai-hint="christmas lights"
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">

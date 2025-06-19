@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         hostname: 'certify.amritkumarchanchal.me',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
