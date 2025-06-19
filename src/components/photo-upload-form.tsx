@@ -74,7 +74,6 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           if (snapshot.totalBytes > 0) {
             progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
-            // This case might happen for very small files or specific scenarios
             progress = 100; 
           }
           setUploadProgress(progress);
@@ -82,22 +81,32 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
         (error) => {
           console.error("Firebase Storage Upload Error:", error); 
           let description = "Could not upload the photo. Please try again.";
+          // More specific error messages
           if (error.code) {
             switch (error.code) {
               case 'storage/unauthorized':
-                description = "Permission denied. Check Firebase Storage security rules.";
+                description = "Permission denied. Check Firebase Storage security rules. Ensure they allow writes to the path you're uploading to. Also, verify the 'storageBucket' name in your firebase.ts config matches your actual bucket name in Google Cloud Console.";
                 break;
               case 'storage/canceled':
                 description = "Upload canceled.";
                 break;
               case 'storage/unknown':
-                description = "An unknown error occurred during upload. This might be a CORS issue. Please verify your Firebase Storage CORS configuration allows requests from your deployment URL. Check console for details.";
+                description = "An unknown error occurred. This might be a CORS issue (check Firebase Storage CORS configuration for your Netlify URL: https://amritbitla.netlify.app) or an issue with the bucket configuration (verify 'storageBucket' in firebase.ts). Check console for details.";
                 break;
-              case 'storage/object-not-found': // Can also be a symptom if preflight for CORS fails
-                 description = "File not found during upload, or possibly a CORS preflight issue. Check Firebase Storage CORS configuration for your deployment URL and console for details.";
+              case 'storage/object-not-found':
+                 description = "File/Bucket not found. This can indicate the 'storageBucket' name in your app's firebase.ts config is incorrect or the bucket doesn't exist. Verify bucket name and its CORS configuration. Check console.";
                  break;
+              case 'storage/quota-exceeded':
+                description = "Storage quota exceeded. You may need to upgrade your Firebase plan or free up space.";
+                break;
+              case 'storage/project-not-found':
+                description = "Firebase project not found. Verify your Firebase configuration in firebase.ts.";
+                break;
+              case 'storage/bucket-not-found':
+                description = "Storage bucket not found. Ensure the 'storageBucket' in firebase.ts is correct and the bucket exists in Google Cloud Console.";
+                break;
               default:
-                description = `Upload error: ${error.message}. If this persists, check Firebase Storage CORS configuration.`;
+                description = `Upload error: ${error.message}. Common issues: Firebase Storage security rules, incorrect 'storageBucket' name in firebase.ts, or CORS misconfiguration. Check browser console.`;
             }
           }
           toast({
@@ -127,7 +136,6 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
               onPhotoAdd(docRef.id);
             }
 
-            // Reset form
             setSelectedFile(null);
             setPreviewUrl(null);
             if (event.target instanceof HTMLFormElement) {
@@ -150,7 +158,7 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
       console.error("General Error in handleSubmit for photo upload:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred during upload. Check console and Firebase Storage CORS configuration.",
+        description: "An unexpected error occurred during upload. Check console, Firebase Storage security rules, bucket name config (firebase.ts), and CORS settings.",
         variant: "destructive",
       });
       setIsUploading(false);
@@ -227,4 +235,3 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
     </Card>
   );
 }
-
