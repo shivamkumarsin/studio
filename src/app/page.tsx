@@ -229,11 +229,11 @@ export default function PublicHomePage() {
               Amrit Kumar Chanchal Photography
             </Link>
             <p className="text-xs text-muted-foreground max-w-sm">
-              Sharing life's aesthetic moments, one snapshot at a time. All photos by Amrit Kumar Chanchal.
+              Sharing life&apos;s aesthetic moments, one snapshot at a time. All photos by Amrit Kumar Chanchal.
             </p>
           </div>
           
-          <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+          <nav className="flex justify-center items-center gap-x-4 sm:gap-x-5 mb-4 text-sm">
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>Home</Button>
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>Highlights</Button>
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('gallery-main-section')}>Gallery</Button>
