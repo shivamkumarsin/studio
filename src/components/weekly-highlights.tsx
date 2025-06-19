@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link"; // Import Link
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Photo } from "@/types";
 import { motion } from "framer-motion";
@@ -39,30 +40,34 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
     >
       {photos.map((photo) => (
         <motion.div key={photo.id} variants={itemVariants}>
-          <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out h-full flex flex-col group transform hover:-translate-y-1 bg-card hover:border-primary">
-            <CardHeader className="p-0 relative aspect-[4/3] w-full overflow-hidden">
-              <Image
-                src={photo.src}
-                alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="transition-transform duration-500 group-hover:scale-110 object-cover"
-                data-ai-hint="highlight event"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </CardHeader>
-            <CardContent className="p-4 flex-grow flex flex-col justify-between">
-              <div>
-                <CardTitle className="font-headline text-xl mb-2 truncate text-card-foreground group-hover:text-primary" title={photo.name}>
-                  {photo.name}
-                </CardTitle>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <CategoryIcon category={photo.category} className="mr-2 h-4 w-4 text-primary" />
-                  <span className="font-body">{photo.category}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <Link href={`/photo/${photo.id}`} passHref legacyBehavior>
+            <a className="block h-full">
+              <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out h-full flex flex-col group transform hover:-translate-y-1 bg-card hover:border-primary">
+                <CardHeader className="p-0 relative aspect-[4/3] w-full overflow-hidden">
+                  <Image
+                    src={photo.src}
+                    alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="transition-transform duration-500 group-hover:scale-110 object-cover"
+                    data-ai-hint="highlight event"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </CardHeader>
+                <CardContent className="p-4 flex-grow flex flex-col justify-between">
+                  <div>
+                    <CardTitle className="font-headline text-xl mb-2 truncate text-card-foreground group-hover:text-primary" title={photo.name}>
+                      {photo.name}
+                    </CardTitle>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <CategoryIcon category={photo.category} className="mr-2 h-4 w-4 text-primary" />
+                      <span className="font-body">{photo.category}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+          </Link>
         </motion.div>
       ))}
     </motion.div>
