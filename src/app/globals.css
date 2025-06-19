@@ -153,11 +153,11 @@ body {
   }
 
   /* Black text only on primary/accent backgrounds */
-  .bg-primary, .bg-primary\\/90, .bg-primary\\/80 {
+  .bg-primary {
     color: #000000 !important;
   }
 
-  .bg-accent, .bg-accent\\/90, .bg-accent\\/80 {
+  .bg-accent {
     color: #000000 !important;
   }
 
@@ -187,11 +187,11 @@ body {
     color: #ffffff !important;
   }
 
-  button.bg-primary, button.bg-primary\\/90, button.bg-primary\\/80 {
+  button.bg-primary {
     color: #000000 !important;
   }
 
-  button.bg-accent, button.bg-accent\\/90, button.bg-accent\\/80 {
+  button.bg-accent {
     color: #000000 !important;
   }
 
@@ -447,7 +447,7 @@ body {
 }
 
 /* Fix specific UI components */
-.bg-white, .bg-white\\/10, .bg-white\\/20 {
+.bg-white {
   background-color: rgba(0, 0, 0, 0.8) !important;
   color: #ffffff !important;
 }
