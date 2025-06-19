@@ -11,7 +11,7 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Images, Mail, Star, ChevronDown, UserCircle } from "lucide-react"; // Changed Camera to Images
+import { Images, Mail, Star, ChevronDown, UserCircle } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -118,7 +118,7 @@ export default function PublicHomePage() {
       <header className="bg-card text-card-foreground py-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <Images className="h-7 w-7 md:h-8 md:w-8 text-primary" /> {/* Changed Camera to Images */}
+            <Images className="h-7 w-7 md:h-8 md:w-8 text-primary" />
             Amrit's Photo Stack
           </Link>
           <nav className="flex items-center gap-1 md:gap-3">
@@ -155,7 +155,7 @@ export default function PublicHomePage() {
             sizes="100vw"
             priority
             className="pointer-events-none object-cover"
-            data-ai-hint="abstract dark texture"
+            data-ai-hint="stars celebration"
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
@@ -204,7 +204,7 @@ export default function PublicHomePage() {
               <p className="text-xl font-body text-muted-foreground">Loading highlights...</p>
             </div>
           ) : highlightPhotos.length > 0 ? (
-            <WeeklyHighlights photos={highlightPhotos} onPhotoClick={openPhotoModal} />
+             <WeeklyHighlights photos={highlightPhotos} />
           ) : (
             <p className="text-center text-muted-foreground">Fresh shots coming soon. Check back later!</p>
           )}
@@ -232,6 +232,7 @@ export default function PublicHomePage() {
                 height={400}
                 className="rounded-lg shadow-xl mx-auto object-cover aspect-square"
                 data-ai-hint="photographer portrait"
+                sizes="(max-width: 768px) 80vw, 400px"
               />
             </div>
             <div className="md:w-2/3 text-center md:text-left">
@@ -277,7 +278,7 @@ export default function PublicHomePage() {
             <p className="text-xl font-body text-muted-foreground">Loading photos from Firebase...</p>
           </div>
         ) : (
-           <PhotoGrid photos={filteredPhotos} onPhotoClick={openPhotoModal} />
+           <PhotoGrid photos={filteredPhotos} />
         )}
       </main>
 
@@ -285,7 +286,7 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 text-center">
           <div className="flex flex-col items-center mb-4">
             <Link href="/" className="text-xl font-headline flex items-center gap-2 hover:opacity-80 transition-opacity mb-2">
-              <Images className="h-6 w-6 text-primary" /> {/* Changed Camera to Images */}
+              <Images className="h-6 w-6 text-primary" />
               Amrit's Photo Stack
             </Link>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -339,3 +340,5 @@ export default function PublicHomePage() {
   );
 }
 
+
+    
