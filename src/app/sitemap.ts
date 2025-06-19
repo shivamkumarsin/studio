@@ -10,13 +10,28 @@ export const revalidate = 86400; // Revalidate a maximum of once per day (86400 
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
-  const staticRoutes = ['', '/admin', '/contact'].map((route) => ({
-    url: `${PRODUCTION_URL}${route}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: route === '' ? 'daily' : 'weekly',
-    priority: route === '' ? 1.0 : 0.8,
-  }));
-
+  const staticRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${PRODUCTION_URL}/`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${PRODUCTION_URL}/contact`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${PRODUCTION_URL}/admin`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Add other static pages here if needed
+  ];
+  
   // Dynamic photo pages
   let photoRoutes: MetadataRoute.Sitemap = [];
   try {
@@ -30,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${PRODUCTION_URL}/amrit-kumar-chanchal/photo/${doc.id}`, // Updated URL structure
         lastModified: photoData.createdAt?.toDate().toISOString() || new Date().toISOString(),
         changeFrequency: 'weekly',
-        priority: 0.7,
+        priority: 1.0, // Set photo priority to 1.0
       };
     });
   } catch (error) {
@@ -39,4 +54,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...staticRoutes, ...photoRoutes];
 }
-
