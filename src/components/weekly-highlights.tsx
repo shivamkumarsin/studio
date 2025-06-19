@@ -39,21 +39,21 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
     >
       {photos.map((photo) => (
         <motion.div key={photo.id} variants={itemVariants}>
-          <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out h-full flex flex-col group transform hover:-translate-y-1">
-            <CardHeader className="p-0 relative aspect-[4/3] w-full">
+          <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out h-full flex flex-col group transform hover:-translate-y-1 bg-card hover:border-primary">
+            <CardHeader className="p-0 relative aspect-[4/3] w-full overflow-hidden"> {/* Added overflow-hidden */}
               <Image
                 src={photo.src}
-                alt={photo.name}
+                alt={photo.name} // Alt text will now include "Amrit Kumar Chanchal"
                 layout="fill"
                 objectFit="cover"
                 className="transition-transform duration-500 group-hover:scale-110"
                 data-ai-hint="highlight event"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </CardHeader>
             <CardContent className="p-4 flex-grow flex flex-col justify-between">
               <div>
-                <CardTitle className="font-headline text-xl mb-2 truncate" title={photo.name}>
+                <CardTitle className="font-headline text-xl mb-2 truncate text-card-foreground group-hover:text-primary" title={photo.name}>
                   {photo.name}
                 </CardTitle>
                 <div className="flex items-center text-sm text-muted-foreground">
@@ -61,7 +61,6 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
                   <span className="font-body">{photo.category}</span>
                 </div>
               </div>
-              {/* You could add a small description or date here if available in Photo data */}
             </CardContent>
           </Card>
         </motion.div>

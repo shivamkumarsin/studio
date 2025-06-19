@@ -3,8 +3,9 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "Amrit's Photo Stack",
-  description: "Amrit's personal photo stack, beautifully organized.",
+  title: "Amrit Kumar Chanchal's Photo Stack",
+  description: "A personal collection of aesthetic photos by Amrit Kumar Chanchal, photographer.",
+  keywords: "Amrit Kumar Chanchal, photography, photos, aesthetic, portfolio",
 };
 
 export default function RootLayout({
@@ -13,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark"> {/* Enforce dark theme by default */}
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

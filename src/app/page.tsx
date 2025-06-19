@@ -11,7 +11,7 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, Star } from "lucide-react";
+import { Camera, Mail, Star, ChevronDown } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -81,10 +81,10 @@ export default function PublicHomePage() {
       : photos.filter((photo) => photo.category === selectedCategory);
 
   const heroVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, y: -50 },
     visible: { 
-      opacity: 1,
-      transition: { staggerChildren: 0.2, delayChildren: 0.1 }
+      opacity: 1, y: 0,
+      transition: { staggerChildren: 0.2, delayChildren: 0.1, duration: 0.6, ease: "easeOut" }
     },
   };
 
@@ -101,20 +101,23 @@ export default function PublicHomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="bg-primary text-primary-foreground py-4 shadow-md sticky top-0 z-50">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <header className="bg-card text-card-foreground py-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <Link href="/" className="text-3xl md:text-4xl font-headline flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <Camera className="h-8 w-8 md:h-10 md:w-10" />
-            Amrit's Photo Stack
+          <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+            <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
+            Amrit K. Chanchal
           </Link>
-          <nav className="flex items-center gap-4 md:gap-6">
-            <Button variant="ghost" onClick={() => scrollToSection('weekly-highlights-section')} className="text-sm md:text-base hover:bg-primary/20">
+          <nav className="flex items-center gap-3 md:gap-5">
+            <Button variant="ghost" onClick={() => scrollToSection('weekly-highlights-section')} className="text-sm md:text-base hover:text-primary">
               Highlights
             </Button>
+            <Button variant="ghost" onClick={() => scrollToSection('category-filter-section')} className="text-sm md:text-base hover:text-primary">
+              Gallery
+            </Button>
             <Link href="/contact" legacyBehavior passHref>
-              <Button variant="ghost" className="text-sm md:text-base hover:bg-primary/20">
-                <Mail className="mr-2 h-4 w-4" /> Contact Us
+              <Button variant="ghost" className="text-sm md:text-base hover:text-primary">
+                <Mail className="mr-1.5 h-4 w-4" /> Contact
               </Button>
             </Link>
           </nav>
@@ -126,53 +129,59 @@ export default function PublicHomePage() {
         variants={heroVariants}
         initial="hidden"
         animate="visible"
-        className="relative py-20 md:py-32 bg-gradient-to-br from-secondary via-background to-background text-center overflow-hidden"
+        className="relative py-24 md:py-40 text-center overflow-hidden bg-gradient-to-br from-background via-card to-secondary"
       >
         <div className="absolute inset-0 opacity-5 md:opacity-10 z-0">
           <Image
             src="https://placehold.co/1920x1080.png"
-            alt="Abstract textured background"
+            alt="Abstract photography background"
             layout="fill"
             objectFit="cover"
-            data-ai-hint="abstract texture"
+            data-ai-hint="abstract dark texture"
             priority
             className="pointer-events-none"
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <motion.h2
+          <motion.h1
             variants={itemVariants}
             className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold text-foreground mb-6"
           >
-            Capture Life's Moments
+            Amrit Kumar Chanchal
+          </motion.h1>
+          <motion.h2
+            variants={itemVariants}
+            className="text-2xl sm:text-3xl md:text-4xl font-headline text-primary mb-8"
+          >
+            Photographer & Visual Storyteller
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Welcome to Amrit's Photo Stack, a personal collection of cherished memories and beautiful snapshots. Explore by category and relive the moments that matter.
+            Exploring the world through my lens. Welcome to my personal collection of aesthetic moments, captured and shared.
           </motion.p>
           <motion.div variants={itemVariants}>
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-10 py-3 shadow-lg transform transition-transform hover:scale-105"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-10 py-3 shadow-lg transform transition-transform hover:scale-105 rounded-full"
               onClick={() => scrollToSection('category-filter-section')}
-              aria-label="Explore photos by scrolling to categories"
+              aria-label="Explore photo gallery"
             >
-              Explore Photos
+              Explore Gallery <ChevronDown className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
         </div>
       </motion.section>
 
-      <section id="weekly-highlights-section" className="py-12 md:py-16 bg-secondary/30 scroll-mt-20">
+      <section id="weekly-highlights-section" className="py-16 md:py-24 bg-card scroll-mt-20">
         <div className="container mx-auto px-4">
           <motion.h2 
             variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-            className="text-3xl md:text-4xl font-headline font-bold text-center text-foreground mb-10 flex items-center justify-center gap-3"
+            className="text-3xl md:text-4xl font-headline font-bold text-center text-primary mb-12 flex items-center justify-center gap-3"
           >
-            <Star className="h-8 w-8 text-accent" />
-            Highlights of the Week
+            <Star className="h-8 w-8" />
+            Recent Captures
           </motion.h2>
           {isLoadingHighlights ? (
             <div className="text-center py-10">
@@ -181,19 +190,28 @@ export default function PublicHomePage() {
           ) : highlightPhotos.length > 0 ? (
             <WeeklyHighlights photos={highlightPhotos} />
           ) : (
-            <p className="text-center text-muted-foreground">No highlights to show this week. Check back soon!</p>
+            <p className="text-center text-muted-foreground">Fresh shots coming soon. Check back later!</p>
           )}
         </div>
       </section>
       
-      <main className="flex-grow container mx-auto px-4 py-12 md:py-16">
+      <main id="gallery-main-section" className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div id="category-filter-section" className="scroll-mt-24">
+           <motion.h2 
+            variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
+            className="text-3xl md:text-4xl font-headline font-bold text-center text-primary mb-4"
+          >
+            Photo Gallery
+          </motion.h2>
+           <p className="text-center text-muted-foreground mb-8 max-w-xl mx-auto">
+            Browse through my collection. Select a category to filter the moments.
+          </p>
           <CategoryFilter
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
         </div>
-        <Separator className="my-8 md:my-10" />
+        <Separator className="my-10 md:my-12" />
         {isLoading ? (
            <div className="text-center py-10">
             <p className="text-xl font-body text-muted-foreground">Loading photos from Firebase...</p>
@@ -205,28 +223,26 @@ export default function PublicHomePage() {
 
       <footer className="bg-secondary text-secondary-foreground py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex flex-col items-center mb-6">
-            <Link href="/" className="text-2xl font-headline flex items-center gap-2.5 hover:opacity-80 transition-opacity mb-2">
-              <Camera className="h-7 w-7" />
-              Amrit's Photo Stack
+          <div className="flex flex-col items-center mb-4">
+            <Link href="/" className="text-xl font-headline flex items-center gap-2 hover:opacity-80 transition-opacity mb-2">
+              <Camera className="h-6 w-6 text-primary" />
+              Amrit Kumar Chanchal Photography
             </Link>
-            <p className="text-sm text-muted-foreground max-w-md">
-              A personal space for sharing life's snapshots and cherished memories.
+            <p className="text-xs text-muted-foreground max-w-sm">
+              Sharing life's aesthetic moments, one snapshot at a time. All photos by Amrit Kumar Chanchal.
             </p>
           </div>
           
-          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6 text-sm">
+          <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>Home</Button>
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>Highlights</Button>
-            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('category-filter-section')}>Categories</Button>
+            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('gallery-main-section')}>Gallery</Button>
             <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
             <Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
           </nav>
           
-          <Separator className="my-4 bg-border/50 w-1/4 mx-auto" />
-          
           <p className="font-body text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Amrit's Photo Stack. All rights reserved.
+            &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved.
             {currentTime && <span className="ml-2 opacity-70">(Local time: {currentTime})</span>}
           </p>
         </div>

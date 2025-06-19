@@ -74,27 +74,26 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           if (snapshot.totalBytes > 0) {
             progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
-            progress = 100; 
+            progress = 100;
           }
           setUploadProgress(progress);
         },
         (error) => {
-          console.error("Firebase Storage Upload Error:", error); 
+          console.error("Firebase Storage Upload Error:", error);
           let description = "Could not upload the photo. Please try again.";
-          // More specific error messages
           if (error.code) {
             switch (error.code) {
               case 'storage/unauthorized':
-                description = "Permission denied. Check Firebase Storage security rules. Ensure they allow writes to the path you're uploading to. Also, verify the 'storageBucket' name in your firebase.ts config matches your actual bucket name in Google Cloud Console.";
+                description = "Permission denied. Check Firebase Storage security rules and ensure your bucket is correctly configured and accessible. You might need to adjust rules in the Firebase console (Storage > Rules).";
                 break;
               case 'storage/canceled':
                 description = "Upload canceled.";
                 break;
               case 'storage/unknown':
-                description = "An unknown error occurred. This might be a CORS issue (check Firebase Storage CORS configuration for your Netlify URL: https://amritbitla.netlify.app) or an issue with the bucket configuration (verify 'storageBucket' in firebase.ts). Check console for details.";
+                description = "An unknown error occurred. This might be a CORS issue (check Firebase Storage CORS configuration) or an issue with the bucket configuration (verify 'storageBucket' in firebase.ts). Check console for details.";
                 break;
               case 'storage/object-not-found':
-                 description = "File/Bucket not found. This can indicate the 'storageBucket' name in your app's firebase.ts config is incorrect or the bucket doesn't exist. Verify bucket name and its CORS configuration. Check console.";
+                 description = "File/Bucket not found. This can indicate the 'storageBucket' name in your app's firebase.ts config is incorrect or the bucket doesn't exist. Verify bucket name, its CORS configuration, and Firebase Storage Rules. Check console.";
                  break;
               case 'storage/quota-exceeded':
                 description = "Storage quota exceeded. You may need to upgrade your Firebase plan or free up space.";
@@ -103,10 +102,10 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
                 description = "Firebase project not found. Verify your Firebase configuration in firebase.ts.";
                 break;
               case 'storage/bucket-not-found':
-                description = "Storage bucket not found. Ensure the 'storageBucket' in firebase.ts is correct and the bucket exists in Google Cloud Console.";
+                description = "Storage bucket not found. Ensure the 'storageBucket' in firebase.ts is correct and the bucket exists in Google Cloud Console, and that Storage is enabled for your Firebase project. Check console.";
                 break;
               default:
-                description = `Upload error: ${error.message}. Common issues: Firebase Storage security rules, incorrect 'storageBucket' name in firebase.ts, or CORS misconfiguration. Check browser console.`;
+                description = `Upload error: ${error.message}. Common issues: Firebase Storage security rules, incorrect 'storageBucket' name in firebase.ts, CORS misconfiguration, or Storage not fully enabled for the project's region. Check browser console.`;
             }
           }
           toast({
@@ -119,9 +118,11 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
         async () => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            const photoDisplayName = `Amrit Kumar Chanchal - ${selectedFile.name}`;
+
             const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
               src: downloadURL,
-              name: selectedFile.name,
+              name: photoDisplayName,
               category: selectedCategory,
               createdAt: serverTimestamp(),
             };
@@ -129,7 +130,8 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
             const docRef = await addDoc(collection(db, "photos"), photoData);
             toast({
               title: "Photo Uploaded!",
-              description: `${selectedFile.name} added to ${selectedCategory}.`,
+              description: `${photoDisplayName} added to ${selectedCategory}.`,
+              variant: "default",
             });
             
             if (onPhotoAdd) {
@@ -141,6 +143,7 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
             if (event.target instanceof HTMLFormElement) {
               event.target.reset();
             }
+            setSelectedCategory(APP_CATEGORIES[0]); // Reset category
             setIsUploading(false);
             setUploadProgress(0);
           } catch (firestoreError) {
