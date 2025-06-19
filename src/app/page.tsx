@@ -11,11 +11,11 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, Star, CalendarDays, Users, Briefcase } from "lucide-react";
+import { Camera, Mail, Star } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { WeeklyHighlights } from "@/components/weekly-highlights"; // New component
+import { WeeklyHighlights } from "@/components/weekly-highlights";
 
 export default function PublicHomePage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -29,7 +29,6 @@ export default function PublicHomePage() {
   useEffect(() => {
     setCurrentTime(new Date().toLocaleTimeString());
 
-    // Fetch all photos for the main grid
     setIsLoading(true);
     const photosCollection = collection(db, "photos");
     const q = query(photosCollection, orderBy("createdAt", "desc"));
@@ -51,7 +50,6 @@ export default function PublicHomePage() {
       setIsLoading(false);
     });
 
-    // Fetch highlight photos (e.g., latest 3)
     setIsLoadingHighlights(true);
     const highlightsQuery = query(photosCollection, orderBy("createdAt", "desc"), limit(3));
     const unsubscribeHighlights = onSnapshot(highlightsQuery, (querySnapshot) => {
@@ -205,52 +203,31 @@ export default function PublicHomePage() {
         )}
       </main>
 
-      <footer className="bg-secondary text-secondary-foreground py-12 md:py-16 mt-auto">
+      <footer className="bg-secondary text-secondary-foreground py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <div className="grid md:grid-cols-3 gap-8 mb-8 items-start">
-            <div>
-              <h3 className="text-xl font-headline font-semibold mb-3 flex items-center justify-center md:justify-start gap-2">
-                <Camera className="h-6 w-6" /> Amrit's Photo Stack
-              </h3>
-              <p className="text-sm text-muted-foreground text-center md:text-left">
-                Reliving memories, one photo at a time. A personal collection of moments captured and cherished.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-headline font-semibold mb-3">Quick Links</h3>
-              <ul className="space-y-2">
-                <li><Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>Home</Button></li>
-                <li><Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>Highlights</Button></li>
-                <li><Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('category-filter-section')}>Categories</Button></li>
-                <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-                <li><Link href="/admin" className="hover:text-primary transition-colors">Admin Panel</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-headline font-semibold mb-3">Connect (Example)</h3>
-              <div className="flex justify-center md:justify-start space-x-4">
-                <Link href="#" aria-label="Facebook" className="text-secondary-foreground hover:text-primary transition-colors">
-                  <Users className="h-6 w-6" /> {/* Placeholder for Facebook icon */}
-                </Link>
-                <Link href="#" aria-label="Instagram" className="text-secondary-foreground hover:text-primary transition-colors">
-                  <CalendarDays className="h-6 w-6" /> {/* Placeholder for Instagram icon */}
-                </Link>
-                <Link href="#" aria-label="Twitter" className="text-secondary-foreground hover:text-primary transition-colors">
-                  <Briefcase className="h-6 w-6" /> {/* Placeholder for Twitter icon */}
-                </Link>
-              </div>
-               <p className="text-xs text-muted-foreground mt-4 text-center md:text-left">
-                Follow Amrit's journey through photos on social media (links are illustrative).
-              </p>
-            </div>
+          <div className="flex flex-col items-center mb-6">
+            <Link href="/" className="text-2xl font-headline flex items-center gap-2.5 hover:opacity-80 transition-opacity mb-2">
+              <Camera className="h-7 w-7" />
+              Amrit's Photo Stack
+            </Link>
+            <p className="text-sm text-muted-foreground max-w-md">
+              A personal space for sharing life's snapshots and cherished memories.
+            </p>
           </div>
-          <Separator className="my-6 bg-border/50" />
-          <p className="font-body text-sm">
-            &copy; {currentTime ? new Date().getFullYear() : '...'} Amrit's Photo Stack. All rights reserved.
-            {currentTime && ` Current time: ${currentTime}`}
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Designed with care for capturing and sharing memories.
+          
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6 text-sm">
+            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>Home</Button>
+            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>Highlights</Button>
+            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('category-filter-section')}>Categories</Button>
+            <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
+            <Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
+          </nav>
+          
+          <Separator className="my-4 bg-border/50 w-1/4 mx-auto" />
+          
+          <p className="font-body text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} Amrit's Photo Stack. All rights reserved.
+            {currentTime && <span className="ml-2 opacity-70">(Local time: {currentTime})</span>}
           </p>
         </div>
       </footer>
