@@ -37,8 +37,8 @@ export default function PublicHomePage() {
     }, (error) => {
       console.error("Error fetching photos from Firestore:", error);
       toast({
-        title: "Error",
-        description: "Could not fetch photos. Please try again later.",
+        title: "Error Fetching Photos",
+        description: "Could not fetch photos. Check browser console for Firestore errors (e.g., missing index or permissions).",
         variant: "destructive",
       });
       setIsLoading(false);

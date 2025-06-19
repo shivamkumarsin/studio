@@ -40,7 +40,7 @@ export default function AdminPage() {
       console.error("Error fetching photos from Firestore:", error);
       toast({
         title: "Error Fetching Photos",
-        description: "Could not fetch photos from Firestore. Please check your connection or Firebase setup.",
+        description: "Could not fetch photos. Check browser console for Firestore errors (e.g., missing index or permissions).",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -60,8 +60,10 @@ export default function AdminPage() {
     try {
       await deleteDoc(doc(db, "photos", photoId));
       
-      if (photoToDelete.src.includes("firebasestorage.googleapis.com")) {
+      // Check if the photo src is a Firebase Storage URL before attempting to delete
+      if (photoToDelete.src && photoToDelete.src.includes("firebasestorage.googleapis.com")) {
         const storage = getStorage();
+        // Create a reference from the full URL
         const photoRef = ref(storage, photoToDelete.src);
         await deleteObject(photoRef);
       }
@@ -74,7 +76,7 @@ export default function AdminPage() {
       console.error("Error deleting photo:", error);
       toast({
         title: "Error Deleting Photo",
-        description: "Could not remove the photo. Please try again.",
+        description: "Could not remove the photo. Please try again. Check console for details.",
         variant: "destructive",
       });
     }
@@ -83,18 +85,19 @@ export default function AdminPage() {
   const handleTestFirebaseConnection = async () => {
     setIsTestingConnection(true);
     try {
+      // Attempt a simple read operation (e.g., get document count)
       const photosCollection = collection(db, "photos");
-      await getCountFromServer(photosCollection); // Simple read operation
+      await getCountFromServer(photosCollection); 
       toast({
         title: "Firebase Connection OK",
         description: "Successfully connected to Firestore and accessed the photos collection.",
-        variant: "default", // Explicitly default, though it is the default
+        variant: "default",
       });
     } catch (error) {
       console.error("Firebase connection test failed:", error);
       toast({
         title: "Firebase Connection Error",
-        description: "Could not connect to Firestore or access the photos collection. Check console for details.",
+        description: "Could not connect to Firestore or access photos. Check browser console for specific error.",
         variant: "destructive",
       });
     } finally {
