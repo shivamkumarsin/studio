@@ -18,11 +18,9 @@ import {
   UserCircle, 
   Camera,
   Sparkles,
-  MapPin,
-  Heart,
   Eye,
   Award,
-  Zap
+  Menu
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
@@ -150,15 +148,15 @@ export default function PublicHomePage() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-primary rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative bg-primary p-2 rounded-full">
-                  <Camera className="h-6 w-6 text-primary-foreground" />
+                <div className="relative bg-primary p-2 rounded-full blue-glow">
+                  <Camera className="h-6 w-6 text-black" />
                 </div>
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Amrit's Photo Stack
+                <h1 className="text-xl font-bold text-primary">
+                  PhotoStack Pro
                 </h1>
-                <p className="text-xs text-muted-foreground">Professional Photography Portfolio</p>
+                <p className="text-xs text-muted-foreground">Professional Photography</p>
               </div>
             </Link>
             
@@ -169,7 +167,7 @@ export default function PublicHomePage() {
                 className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
               >
                 <Star className="mr-2 h-4 w-4" />
-                Featured Work
+                Featured
               </Button>
               <Button 
                 variant="ghost" 
@@ -196,7 +194,7 @@ export default function PublicHomePage() {
               <Link href="/admin">
                 <Button 
                   variant="outline" 
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                  className="border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 blue-glow-hover"
                 >
                   Admin
                 </Button>
@@ -204,8 +202,8 @@ export default function PublicHomePage() {
             </nav>
 
             {/* Mobile menu button */}
-            <Button variant="ghost" className="md:hidden">
-              <Images className="h-6 w-6" />
+            <Button variant="ghost" className="md:hidden text-primary">
+              <Menu className="h-6 w-6" />
             </Button>
           </div>
         </div>
@@ -222,7 +220,7 @@ export default function PublicHomePage() {
         {/* Background with parallax */}
         <motion.div 
           style={{ y: y1 }}
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-5"
         >
           <Image
             src={HERO_BACKDROP_IMAGE_URL}
@@ -238,12 +236,12 @@ export default function PublicHomePage() {
         <div className="absolute inset-0 professional-grid opacity-20"></div>
 
         {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-background/80"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 via-transparent to-accent/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-background/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-accent/10"></div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div variants={itemVariants} className="mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <Award className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Professional Photography</span>
               <Sparkles className="h-4 w-4 text-accent" />
@@ -254,11 +252,9 @@ export default function PublicHomePage() {
             variants={itemVariants}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6"
           >
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent subtle-glow">
-              Amrit Kumar
+            <span className="text-primary subtle-glow font-black">
+              Amrit Kumar Chanchal
             </span>
-            <br />
-            <span className="text-foreground font-light">Chanchal</span>
           </motion.h1>
 
           <motion.div variants={itemVariants} className="mb-8">
@@ -279,7 +275,7 @@ export default function PublicHomePage() {
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary text-primary-foreground font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 animate-glow"
+              className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 blue-glow animate-glow"
               onClick={() => scrollToSection('category-filter-section')}
             >
               <Eye className="mr-2 h-5 w-5" />
@@ -290,7 +286,7 @@ export default function PublicHomePage() {
             <Button
               variant="outline"
               size="lg"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 rounded-full transition-all duration-300"
+              className="border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 rounded-full transition-all duration-300 blue-glow-hover"
               onClick={() => scrollToSection('about-me-section')}
             >
               <UserCircle className="mr-2 h-5 w-5" />
@@ -318,11 +314,11 @@ export default function PublicHomePage() {
         {/* Floating elements */}
         <motion.div 
           style={{ y: y2 }}
-          className="absolute top-1/4 left-10 w-20 h-20 border border-primary/20 rounded-full animate-float hidden lg:block"
+          className="absolute top-1/4 left-10 w-20 h-20 border border-primary/30 rounded-full animate-float hidden lg:block blue-glow"
         ></motion.div>
         <motion.div 
           style={{ y: y1 }}
-          className="absolute bottom-1/4 right-10 w-16 h-16 border border-accent/20 rounded-full animate-float hidden lg:block"
+          className="absolute bottom-1/4 right-10 w-16 h-16 border border-accent/30 rounded-full animate-float hidden lg:block"
         ></motion.div>
       </motion.section>
 
@@ -337,12 +333,12 @@ export default function PublicHomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-accent/20 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-accent/30 mb-6 blue-glow">
               <Star className="h-4 w-4 text-accent animate-pulse" />
               <span className="text-sm text-muted-foreground">Featured Collection</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+              <span className="text-primary subtle-glow">
                 Latest Work
               </span>
             </h2>
@@ -381,12 +377,12 @@ export default function PublicHomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <UserCircle className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">About the Artist</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-primary subtle-glow">
                 Professional Journey
               </span>
             </h2>
@@ -400,8 +396,8 @@ export default function PublicHomePage() {
             className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-3xl"></div>
-              <div className="relative glass rounded-3xl p-8 border border-primary/20">
+              <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-3xl"></div>
+              <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
                   alt="Amrit Kumar Chanchal - Professional Photographer"
@@ -410,7 +406,7 @@ export default function PublicHomePage() {
                   className="rounded-2xl mx-auto object-cover aspect-square shadow-2xl"
                   sizes="(max-width: 768px) 80vw, 400px"
                 />
-                <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
+                <div className="absolute -bottom-4 -right-4 bg-primary text-black p-3 rounded-full shadow-lg blue-glow">
                   <Camera className="h-6 w-6" />
                 </div>
               </div>
@@ -440,17 +436,17 @@ export default function PublicHomePage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Portrait Photography</span>
-                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Commercial Work</span>
-                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Event Coverage</span>
-                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Creative Projects</span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Portrait Photography</span>
+                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Commercial Work</span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Event Coverage</span>
+                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Creative Projects</span>
               </div>
 
               <div className="flex gap-4 pt-4">
                 <Button
                   size="lg"
                   onClick={() => scrollToSection('category-filter-section')}
-                  className="bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary text-primary-foreground rounded-full transition-all duration-300"
+                  className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow"
                 >
                   <Eye className="mr-2 h-5 w-5" />
                   View Portfolio
@@ -458,7 +454,7 @@ export default function PublicHomePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full transition-all duration-300"
+                  className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover"
                   onClick={() => scrollToSection('weekly-highlights-section')}
                 >
                   <Star className="mr-2 h-5 w-5" />
@@ -482,12 +478,12 @@ export default function PublicHomePage() {
               transition={{ duration: 0.8 }}
               className="text-center mb-16"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
                 <Images className="h-4 w-4 text-primary" />
                 <span className="text-sm text-muted-foreground">Complete Portfolio</span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span className="text-primary subtle-glow">
                   Photography Portfolio
                 </span>
               </h2>
@@ -526,15 +522,15 @@ export default function PublicHomePage() {
             <Link href="/" className="inline-flex items-center gap-3 group mb-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-primary rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative bg-primary p-2 rounded-full">
-                  <Camera className="h-6 w-6 text-primary-foreground" />
+                <div className="relative bg-primary p-2 rounded-full blue-glow">
+                  <Camera className="h-6 w-6 text-black" />
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Amrit's Photo Stack
+                <h3 className="text-xl font-bold text-primary">
+                  PhotoStack Pro
                 </h3>
-                <p className="text-xs text-muted-foreground">Professional Photography Portfolio</p>
+                <p className="text-xs text-muted-foreground">Professional Photography</p>
               </div>
             </Link>
             
@@ -577,9 +573,9 @@ export default function PublicHomePage() {
       {/* Photo Modal */}
       {selectedPhotoForModal && (
         <Dialog open={!!selectedPhotoForModal} onOpenChange={(isOpen) => { if (!isOpen) closePhotoModal(); }}>
-          <DialogContent className="max-w-4xl w-full p-0 glass border border-primary/20">
+          <DialogContent className="max-w-4xl w-full p-0 glass border border-primary/30 blue-glow">
             <DialogHeader className="p-6 border-b border-border/50">
-              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-bold text-primary">
                 {selectedPhotoForModal.name}
               </DialogTitle>
               {selectedPhotoForModal.description && (
@@ -599,18 +595,8 @@ export default function PublicHomePage() {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-border/50 flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" className="border-primary/20 hover:bg-primary/10">
-                  <Heart className="mr-2 h-4 w-4" />
-                  Like
-                </Button>
-                <Button variant="outline" size="sm" className="border-primary/20 hover:bg-primary/10">
-                  <Zap className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
-              </div>
-              <Button variant="outline" onClick={closePhotoModal} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+            <div className="p-6 border-t border-border/50 flex justify-end">
+              <Button variant="outline" onClick={closePhotoModal} className="border-primary text-primary hover:bg-primary hover:text-black blue-glow-hover">
                 Close
               </Button>
             </div>
