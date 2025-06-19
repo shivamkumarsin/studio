@@ -1,30 +1,43 @@
 
 import type { MetadataRoute } from 'next';
+import { db } from '@/lib/firebase'; // Import Firestore instance
+import { collection, getDocs, query, orderBy } from 'firebase/firestore'; // Import Firestore functions
+import type { Photo } from '@/types'; // Import Photo type if needed for modification dates
 
-// IMPORTANT: Replace this with your actual production URL
+// IMPORTANT: Ensure this is your actual production URL
 const PRODUCTION_URL = 'https://amritbitla.netlify.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // For a dynamic sitemap that includes individual photo pages,
-  // you would first need to create those pages (e.g., /photo/[id]).
-  // Then, you would fetch photo IDs from Firestore here:
-  // const photosCollection = collection(db, "photos");
-  // const photosSnapshot = await getDocs(query(photosCollection, select("id"))); // Firestore v9+
-  // const photoRoutes = photosSnapshot.docs.map((doc) => ({
-  //   url: `${PRODUCTION_URL}/photo/${doc.id}`,
-  //   lastModified: new Date().toISOString(), // Or use photo.createdAt if available
-  // }));
-
   // Static pages
   const staticRoutes = ['', '/admin', '/contact'].map((route) => ({
     url: `${PRODUCTION_URL}${route}`,
     lastModified: new Date().toISOString(),
-    changeFrequency: route === '' ? 'daily' : 'weekly', // Homepage more frequent
+    changeFrequency: route === '' ? 'daily' : 'weekly',
     priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // Combine static routes with dynamic photo routes if you implement them
-  // return [...staticRoutes, ...photoRoutes];
-  return [...staticRoutes];
-}
+  // Dynamic photo pages
+  let photoRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const photosCollection = collection(db, "photos");
+    // You might want to order by createdAt if you use that for lastModified
+    const photosQuery = query(photosCollection, orderBy("createdAt", "desc")); 
+    const photosSnapshot = await getDocs(photosQuery);
+    
+    photoRoutes = photosSnapshot.docs.map((doc) => {
+      const photoData = doc.data() as Photo;
+      return {
+        url: `${PRODUCTION_URL}/photo/${doc.id}`,
+        // Use photo's createdAt or a general lastModified date
+        lastModified: photoData.createdAt?.toDate().toISOString() || new Date().toISOString(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching photos for sitemap:", error);
+    // Keep static routes even if photo fetching fails
+  }
 
+  return [...staticRoutes, ...photoRoutes];
+}
