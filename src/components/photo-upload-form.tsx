@@ -74,54 +74,77 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           if (snapshot.totalBytes > 0) {
             progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
-            // This case is unusual, might indicate completion of an initially unknown size
             progress = 100;
           }
-          // If snapshot.bytesTransferred is 0 and snapshot.totalBytes is 0, progress remains 0.
           setUploadProgress(progress);
         },
         (error) => {
-          console.error("Upload failed:", error);
+          console.error("Firebase Storage Upload Error:", error); // More detailed logging
+          let description = "Could not upload the photo. Please try again.";
+          if (error.code) {
+            switch (error.code) {
+              case 'storage/unauthorized':
+                description = "Permission denied. Check Firebase Storage security rules.";
+                break;
+              case 'storage/canceled':
+                description = "Upload canceled.";
+                break;
+              case 'storage/unknown':
+                description = "An unknown error occurred during upload. Check console for details.";
+                break;
+              default:
+                description = `Upload error: ${error.message}`;
+            }
+          }
           toast({
             title: "Upload Failed",
-            description: "Could not upload the photo. Please try again.",
+            description: description,
             variant: "destructive",
           });
           setIsUploading(false);
         },
         async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
-            src: downloadURL,
-            name: selectedFile.name,
-            category: selectedCategory,
-            createdAt: serverTimestamp(),
-          };
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
+              src: downloadURL,
+              name: selectedFile.name,
+              category: selectedCategory,
+              createdAt: serverTimestamp(),
+            };
 
-          const docRef = await addDoc(collection(db, "photos"), photoData);
-          toast({
-            title: "Photo Uploaded!",
-            description: `${selectedFile.name} added to ${selectedCategory}.`,
-          });
-          
-          if (onPhotoAdd) {
-            onPhotoAdd(docRef.id);
+            const docRef = await addDoc(collection(db, "photos"), photoData);
+            toast({
+              title: "Photo Uploaded!",
+              description: `${selectedFile.name} added to ${selectedCategory}.`,
+            });
+            
+            if (onPhotoAdd) {
+              onPhotoAdd(docRef.id);
+            }
+
+            // Reset form
+            setSelectedFile(null);
+            setPreviewUrl(null);
+            (event.target as HTMLFormElement).reset(); 
+            setIsUploading(false);
+            setUploadProgress(0);
+          } catch (firestoreError) {
+             console.error("Firestore Document Creation Error:", firestoreError);
+             toast({
+                title: "Error Saving Photo Details",
+                description: "Photo uploaded, but failed to save details. Check console.",
+                variant: "destructive",
+             });
+             setIsUploading(false);
           }
-
-          // Reset form
-          setSelectedFile(null);
-          setPreviewUrl(null);
-          // setSelectedCategory(""); // Optionally reset category
-          (event.target as HTMLFormElement).reset(); // Resets file input
-          setIsUploading(false);
-          setUploadProgress(0);
         }
       );
     } catch (error) {
-      console.error("Error uploading photo:", error);
+      console.error("General Error in handleSubmit for photo upload:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred during upload.",
+        description: "An unexpected error occurred during upload. Check console.",
         variant: "destructive",
       });
       setIsUploading(false);
