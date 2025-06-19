@@ -1,3 +1,4 @@
+
 import type { MetadataRoute } from 'next';
 
 // IMPORTANT: Replace this with your actual production URL
@@ -26,3 +27,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // return [...staticRoutes, ...photoRoutes];
   return [...staticRoutes];
 }
+

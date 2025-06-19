@@ -92,14 +92,14 @@ export function PhotoUploadForm() {
     let successfulUploads = 0;
     const totalFiles = selectedFiles.length;
     const plainTextDescription = stripHtml(description);
-    const photoTitleWithPrefix = `Amrit Kumar Chanchal - ${title.trim()}`;
+    const photoTitleForDB = title.trim(); // Title as entered by the user
 
     for (let i = 0; i < totalFiles; i++) {
       const file = selectedFiles[i];
       setCurrentTaskMessage(`Uploading ${file.name} (${i + 1} of ${totalFiles})...`);
       
       try {
-        // Generate a unique filename for storage, but use the user-provided title for display
+        // Generate a unique filename for storage
         const uniqueStorageFilename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
         const storageRef = ref(storage, `photos/${uniqueStorageFilename}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -125,7 +125,7 @@ export function PhotoUploadForm() {
                 
                 const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
                   src: downloadURL,
-                  name: photoTitleWithPrefix, // User-defined title
+                  name: photoTitleForDB, // Use the user-defined title directly
                   category: selectedCategory,
                   description: plainTextDescription,
                   createdAt: serverTimestamp(),
@@ -134,7 +134,7 @@ export function PhotoUploadForm() {
                 await addDoc(collection(db, "photos"), photoData);
                 toast({
                   title: "Photo Uploaded!",
-                  description: `"${photoTitleWithPrefix}" added to ${selectedCategory}.`,
+                  description: `"${photoTitleForDB}" added to ${selectedCategory}.`,
                   variant: "default",
                 });
                 successfulUploads++;
@@ -142,7 +142,7 @@ export function PhotoUploadForm() {
               } catch (firestoreError) {
                  console.error(`Firestore Error for ${file.name}:`, firestoreError);
                  toast({
-                    title: `Error Saving Details for "${photoTitleWithPrefix}"`,
+                    title: `Error Saving Details for "${photoTitleForDB}"`,
                     description: "Photo uploaded, but failed to save details to database. Check Firestore rules/console.",
                     variant: "destructive",
                  });
@@ -238,7 +238,6 @@ export function PhotoUploadForm() {
                 className="flex-1"
               />
             </div>
-             <p className="text-xs text-muted-foreground ml-7">Your name "Amrit Kumar Chanchal - " will be automatically added as a prefix.</p>
           </div>
 
           <div className="space-y-2">
@@ -286,5 +285,3 @@ export function PhotoUploadForm() {
     </Card>
   );
 }
-
-    
