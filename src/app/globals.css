@@ -307,16 +307,14 @@ body {
   100% { background-position: 60px 60px, 60px 60px, 120px 120px; }
 }
 
-/* Enhanced glow effects */
-.subtle-glow {
-  text-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(59, 130, 246, 0.6),
-    0 0 30px rgba(59, 130, 246, 0.4),
-    0 0 40px rgba(59, 130, 246, 0.2);
-  color: #ffffff !important;
+/* Clean headline styles - NO EFFECTS */
+.clean-headline {
+  color: rgb(59 130 246) !important; /* Professional blue */
+  font-weight: 900; /* Extra bold */
+  letter-spacing: -0.02em; /* Tight letter spacing */
 }
 
+/* Enhanced glow effects for other elements (NOT headlines) */
 .blue-glow {
   box-shadow: 
     0 0 20px rgba(59, 130, 246, 0.4),

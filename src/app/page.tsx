@@ -250,11 +250,9 @@ export default function PublicHomePage() {
 
           <motion.h1
             variants={itemVariants}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 clean-headline"
           >
-            <span className="text-primary subtle-glow font-black">
-              Amrit Kumar Chanchal
-            </span>
+            Amrit Kumar Chanchal
           </motion.h1>
 
           <motion.div variants={itemVariants} className="mb-8">
@@ -337,10 +335,8 @@ export default function PublicHomePage() {
               <Star className="h-4 w-4 text-accent animate-pulse" />
               <span className="text-sm text-muted-foreground">Featured Collection</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="text-primary subtle-glow">
-                Latest Work
-              </span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
+              Latest Work
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Showcasing my most recent photography projects and creative endeavors. 
@@ -381,10 +377,8 @@ export default function PublicHomePage() {
               <UserCircle className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">About the Artist</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="text-primary subtle-glow">
-                Professional Journey
-              </span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
+              Professional Journey
             </h2>
           </motion.div>
 
@@ -482,10 +476,8 @@ export default function PublicHomePage() {
                 <Images className="h-4 w-4 text-primary" />
                 <span className="text-sm text-muted-foreground">Complete Portfolio</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                <span className="text-primary subtle-glow">
-                  Photography Portfolio
-                </span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
+                Photography Portfolio
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
                 Explore my complete collection of photography work organized by category. 
