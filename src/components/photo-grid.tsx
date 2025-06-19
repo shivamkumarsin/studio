@@ -7,7 +7,7 @@ import type { Photo } from "@/types";
 import { CategoryIcon } from "./icons/category-icon";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trash2, Image as ImageIconPlaceholder, Eye, Heart, Share2, Download } from "lucide-react";
+import { Trash2, Image as ImageIconPlaceholder, Eye, Heart, Zap } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,

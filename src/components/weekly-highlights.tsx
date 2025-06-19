@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Photo } from "@/types";
 import { motion } from "framer-motion";
 import { CategoryIcon } from "./icons/category-icon";
-import { Eye, Heart, Star } from "lucide-react";
+import { Eye, Heart, Star, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface WeeklyHighlightsProps {
@@ -23,7 +23,7 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
             <Star className="w-16 h-16 text-accent mx-auto" />
           </div>
         </div>
-        <p className="text-muted-foreground">No highlights to display this week.</p>
+        <p className="text-muted-foreground">No featured work to display at this time.</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
                 {/* Featured badge */}
                 <div className="absolute top-4 left-4 z-10">
                   <div className="flex items-center gap-1 px-3 py-1 bg-accent/90 text-accent-foreground rounded-full text-xs font-bold backdrop-blur-sm shadow-lg">
-                    <Star className="h-3 w-3 animate-pulse" />
+                    <Award className="h-3 w-3 animate-pulse" />
                     <span>Featured</span>
                   </div>
                 </div>

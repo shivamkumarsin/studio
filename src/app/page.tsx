@@ -21,8 +21,8 @@ import {
   MapPin,
   Heart,
   Eye,
-  Download,
-  Share2
+  Award,
+  Zap
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
@@ -158,7 +158,7 @@ export default function PublicHomePage() {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   Amrit's Photo Stack
                 </h1>
-                <p className="text-xs text-muted-foreground">NYC Vibes Collection</p>
+                <p className="text-xs text-muted-foreground">Professional Photography Portfolio</p>
               </div>
             </Link>
             
@@ -169,7 +169,7 @@ export default function PublicHomePage() {
                 className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
               >
                 <Star className="mr-2 h-4 w-4" />
-                Highlights
+                Featured Work
               </Button>
               <Button 
                 variant="ghost" 
@@ -185,7 +185,7 @@ export default function PublicHomePage() {
                 className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
               >
                 <Images className="mr-2 h-4 w-4" />
-                Gallery
+                Portfolio
               </Button>
               <Link href="/contact">
                 <Button variant="ghost" className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300">
@@ -234,8 +234,8 @@ export default function PublicHomePage() {
           />
         </motion.div>
 
-        {/* NYC Grid overlay */}
-        <div className="absolute inset-0 nyc-grid opacity-20"></div>
+        {/* Professional Grid overlay */}
+        <div className="absolute inset-0 professional-grid opacity-20"></div>
 
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-background/60 to-background/80"></div>
@@ -244,8 +244,8 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div variants={itemVariants} className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">New York City Inspired</span>
+              <Award className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">Professional Photography</span>
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
           </motion.div>
@@ -254,7 +254,7 @@ export default function PublicHomePage() {
             variants={itemVariants}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6"
           >
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent neon-text">
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent subtle-glow">
               Amrit Kumar
             </span>
             <br />
@@ -268,11 +268,11 @@ export default function PublicHomePage() {
               <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent flex-1 max-w-20"></div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-muted-foreground mb-2">
-              Visual Storyteller & Photographer
+              Professional Photographer & Visual Artist
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Capturing the energy and soul of moments through my lens. 
-              Welcome to my collection of aesthetic memories and urban stories.
+              Specializing in capturing authentic moments and creating compelling visual narratives. 
+              Welcome to my professional photography portfolio showcasing diverse projects and artistic vision.
             </p>
           </motion.div>
 
@@ -283,7 +283,7 @@ export default function PublicHomePage() {
               onClick={() => scrollToSection('category-filter-section')}
             >
               <Eye className="mr-2 h-5 w-5" />
-              Explore Gallery
+              View Portfolio
               <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
             </Button>
             
@@ -293,8 +293,8 @@ export default function PublicHomePage() {
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 rounded-full transition-all duration-300"
               onClick={() => scrollToSection('about-me-section')}
             >
-              <Heart className="mr-2 h-5 w-5" />
-              My Story
+              <UserCircle className="mr-2 h-5 w-5" />
+              Learn More
             </Button>
           </motion.div>
 
@@ -302,7 +302,7 @@ export default function PublicHomePage() {
           <motion.div variants={itemVariants} className="mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{photos.length}+</div>
-              <div className="text-sm text-muted-foreground">Photos</div>
+              <div className="text-sm text-muted-foreground">Projects</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-accent">6</div>
@@ -310,7 +310,7 @@ export default function PublicHomePage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">∞</div>
-              <div className="text-sm text-muted-foreground">Memories</div>
+              <div className="text-sm text-muted-foreground">Possibilities</div>
             </div>
           </motion.div>
         </div>
@@ -326,7 +326,7 @@ export default function PublicHomePage() {
         ></motion.div>
       </motion.section>
 
-      {/* Weekly Highlights */}
+      {/* Featured Work */}
       <section id="weekly-highlights-section" className="py-20 md:py-32 relative scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
         <div className="container mx-auto px-4 relative">
@@ -343,11 +343,12 @@ export default function PublicHomePage() {
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                Recent Captures
+                Latest Work
               </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Fresh perspectives and moments that caught my eye. Each frame tells a unique story.
+              Showcasing my most recent photography projects and creative endeavors. 
+              Each image represents a unique story and artistic vision.
             </p>
           </motion.div>
 
@@ -355,7 +356,7 @@ export default function PublicHomePage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3">
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xl text-muted-foreground">Loading highlights...</p>
+                <p className="text-xl text-muted-foreground">Loading featured work...</p>
               </div>
             </div>
           ) : highlightPhotos.length > 0 ? (
@@ -363,7 +364,7 @@ export default function PublicHomePage() {
           ) : (
             <div className="text-center py-20">
               <Camera className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <p className="text-muted-foreground">Fresh shots coming soon. Check back later!</p>
+              <p className="text-muted-foreground">New projects coming soon. Stay tuned for updates!</p>
             </div>
           )}
         </div>
@@ -371,7 +372,7 @@ export default function PublicHomePage() {
 
       {/* About Section */}
       <section id="about-me-section" className="py-20 md:py-32 relative scroll-mt-20">
-        <div className="absolute inset-0 nyc-grid opacity-5"></div>
+        <div className="absolute inset-0 professional-grid opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
@@ -382,11 +383,11 @@ export default function PublicHomePage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
               <UserCircle className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Get to Know Me</span>
+              <span className="text-sm text-muted-foreground">About the Artist</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Behind the Lens
+                Professional Journey
               </span>
             </h2>
           </motion.div>
@@ -403,7 +404,7 @@ export default function PublicHomePage() {
               <div className="relative glass rounded-3xl p-8 border border-primary/20">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
-                  alt="Amrit Kumar Chanchal"
+                  alt="Amrit Kumar Chanchal - Professional Photographer"
                   width={400}
                   height={400}
                   className="rounded-2xl mx-auto object-cover aspect-square shadow-2xl"
@@ -418,29 +419,31 @@ export default function PublicHomePage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-3xl font-bold text-foreground mb-2">Amrit Kumar Chanchal</h3>
-                <p className="text-primary font-semibold">Visual Storyteller & NYC Enthusiast</p>
+                <p className="text-primary font-semibold">Professional Photographer & Creative Director</p>
               </div>
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Hello! I'm Amrit, a passionate photographer inspired by the vibrant energy of New York City. 
-                  My journey began with a simple desire to capture the beauty and emotion in everyday moments.
+                  Welcome to my professional photography portfolio. I'm Amrit, a dedicated photographer 
+                  with a passion for creating compelling visual narratives that resonate with audiences.
                 </p>
                 <p>
-                  From the bustling streets to intimate portraits, I believe every photograph tells a story. 
-                  This website is my digital canvas where I share my aesthetic vision with the world.
+                  My expertise spans multiple photography disciplines, from corporate portraits to 
+                  creative projects. I believe in the power of photography to tell stories, 
+                  capture emotions, and preserve important moments.
                 </p>
                 <p>
-                  My work focuses on creating images that resonate, inspire, and connect with viewers on an emotional level. 
-                  Each shot is carefully crafted to preserve memories and moments that matter.
+                  This portfolio showcases my commitment to excellence in visual storytelling, 
+                  technical proficiency, and artistic vision. Each project represents a collaborative 
+                  effort to bring ideas to life through the lens.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Street Photography</span>
-                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Portraits</span>
-                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Urban Landscapes</span>
-                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Events</span>
+                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Portrait Photography</span>
+                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Commercial Work</span>
+                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">Event Coverage</span>
+                <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm border border-accent/20">Creative Projects</span>
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -450,7 +453,7 @@ export default function PublicHomePage() {
                   className="bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary text-primary-foreground rounded-full transition-all duration-300"
                 >
                   <Eye className="mr-2 h-5 w-5" />
-                  View My Work
+                  View Portfolio
                 </Button>
                 <Button
                   variant="outline"
@@ -459,7 +462,7 @@ export default function PublicHomePage() {
                   onClick={() => scrollToSection('weekly-highlights-section')}
                 >
                   <Star className="mr-2 h-5 w-5" />
-                  Highlights
+                  Featured Work
                 </Button>
               </div>
             </div>
@@ -467,7 +470,7 @@ export default function PublicHomePage() {
         </div>
       </section>
       
-      {/* Gallery Section */}
+      {/* Portfolio Section */}
       <main id="gallery-main-section" className="py-20 md:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent"></div>
         <div className="container mx-auto px-4 relative">
@@ -481,15 +484,16 @@ export default function PublicHomePage() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-6">
                 <Images className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Complete Collection</span>
+                <span className="text-sm text-muted-foreground">Complete Portfolio</span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-4">
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Photo Gallery
+                  Photography Portfolio
                 </span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-                Browse through my complete collection. Filter by category to explore specific moments and themes.
+                Explore my complete collection of photography work organized by category. 
+                Each section represents different aspects of my professional practice and creative vision.
               </p>
               
               <CategoryFilter
@@ -505,7 +509,7 @@ export default function PublicHomePage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3">
                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xl text-muted-foreground">Loading gallery from Firebase...</p>
+                <p className="text-xl text-muted-foreground">Loading portfolio...</p>
               </div>
             </div>
           ) : (
@@ -530,12 +534,13 @@ export default function PublicHomePage() {
                 <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   Amrit's Photo Stack
                 </h3>
-                <p className="text-xs text-muted-foreground">NYC Vibes Collection</p>
+                <p className="text-xs text-muted-foreground">Professional Photography Portfolio</p>
               </div>
             </Link>
             
             <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
-              Capturing life's aesthetic moments with NYC energy. Every frame tells a story, every moment matters.
+              Professional photography services specializing in visual storytelling and creative excellence. 
+              Bringing your vision to life through the art of photography.
             </p>
           </div>
           
@@ -544,13 +549,13 @@ export default function PublicHomePage() {
               Home
             </Button>
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>
-              Highlights
+              Featured Work
             </Button>
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('about-me-section')}>
               About
             </Button>
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('gallery-main-section')}>
-              Gallery
+              Portfolio
             </Button>
             <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
               Contact
@@ -563,7 +568,7 @@ export default function PublicHomePage() {
           <div className="text-center">
             <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-6"></div>
             <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Made with ❤️ in NYC style.
+              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Professional Photography Services.
             </p>
           </div>
         </div>
@@ -601,7 +606,7 @@ export default function PublicHomePage() {
                   Like
                 </Button>
                 <Button variant="outline" size="sm" className="border-primary/20 hover:bg-primary/10">
-                  <Share2 className="mr-2 h-4 w-4" />
+                  <Zap className="mr-2 h-4 w-4" />
                   Share
                 </Button>
               </div>
