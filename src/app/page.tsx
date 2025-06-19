@@ -115,15 +115,15 @@ export default function PublicHomePage() {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { staggerChildren: 0.25, delayChildren: 0.1, duration: 0.6, ease: "easeOut" }
+      transition: { staggerChildren: 0.2, delayChildren: 0.1, duration: 0.5, ease: "easeOut" }
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 25 },
     visible: { 
       opacity: 1, y: 0,
-      transition: { type: "spring", stiffness: 90, damping: 15 }
+      transition: { type: "spring", stiffness: 100, damping: 12 }
     },
   };
 
@@ -174,7 +174,7 @@ export default function PublicHomePage() {
           ) : (
             <Image
               src={currentHeroImageUrl}
-              alt="Amrit Kumar Chanchal - Hero photography background"
+              alt="Hero backdrop for Amrit's Photo Stack"
               layout="fill"
               objectFit="cover"
               data-ai-hint="abstract dark texture"
@@ -200,7 +200,7 @@ export default function PublicHomePage() {
             variants={itemVariants}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Exploring the world through my lens. Welcome to my personal collection of aesthetic moments, captured and shared for Google Images and beyond.
+            Exploring the world through my lens. Welcome to my personal collection of aesthetic moments, captured and shared.
           </motion.p>
           <motion.div variants={itemVariants}>
             <Button
@@ -269,7 +269,7 @@ export default function PublicHomePage() {
                 Hello! I'm Amrit, a passionate photographer driven by the desire to capture the beauty and emotion in everyday moments. From vibrant landscapes to intimate portraits, my goal is to tell stories through my lens. 
               </p>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                This website is my personal canvas, a place where I share my aesthetic vision with the world. I believe every picture holds a unique narrative, and I'm thrilled to share mine with you. My focus is on creating images that resonate and are discoverable, hoping they bring a bit of inspiration or joy.
+                This website is my personal canvas, a place where I share my aesthetic vision with the world. I believe every picture holds a unique narrative, and I'm thrilled to share mine with you. My focus is on creating images that resonate and are discoverable.
               </p>
               <Button
                 size="lg"
@@ -293,7 +293,7 @@ export default function PublicHomePage() {
             Photo Gallery
           </motion.h2>
            <p className="text-center text-muted-foreground mb-8 max-w-xl mx-auto">
-            Browse through my collection. Select a category to filter the moments.
+            Browse through my collection. Select a category to filter the moments. Click any photo to view it larger.
           </p>
           <CategoryFilter
             selectedCategory={selectedCategory}
