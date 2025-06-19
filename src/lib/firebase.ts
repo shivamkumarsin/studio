@@ -3,15 +3,15 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth"; // Import getAuth
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyB2rJ-09fvNF6G36s8FoWyMqaEQpkCPOjI",
   authDomain: "amrit-website.firebaseapp.com",
   projectId: "amrit-website",
-  storageBucket: "amrit-website.firebasestorage.app", // Updated to match user's confirmed bucket name
+  storageBucket: "amrit-website.firebasestorage.app",
   messagingSenderId: "356146249369",
   appId: "1:356146249369:web:3f09b6f869bb05e1ea8208",
   measurementId: "G-HCSLW22K9S"
@@ -26,12 +26,8 @@ if (!getApps().length) {
 }
 
 const db = getFirestore(app);
-
-// Initialize Firebase Storage.
-// The storageBucket from firebaseConfig will be used.
-// Ensure Firebase Storage is enabled in your new Firebase project and
-// the bucket name matches.
 const storage = getStorage(app);
+const auth = getAuth(app); // Initialize and export auth
 
 // Initialize Firebase Analytics if supported
 let analytics;
@@ -45,4 +41,4 @@ if (typeof window !== 'undefined') { // Ensure this code runs only in the browse
   });
 }
 
-export { app, db, storage, analytics };
+export { app, db, storage, auth, analytics };
