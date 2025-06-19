@@ -10,30 +10,30 @@ body {
 
 @layer base {
   :root {
-    /* Professional Black & Blue Theme with White Text */
+    /* Professional Black & Blue Theme with Pure White Text */
     --background: 0 0 0; /* Pure black */
     --foreground: 255 255 255; /* Pure white text */
 
     --card: 15 15 15; /* Dark charcoal */
-    --card-foreground: 255 255 255; /* White text */
+    --card-foreground: 255 255 255; /* Pure white text */
 
     --popover: 20 20 20;
-    --popover-foreground: 255 255 255;
+    --popover-foreground: 255 255 255; /* Pure white text */
 
     --primary: 59 130 246; /* Professional blue */
     --primary-foreground: 0 0 0;
 
     --secondary: 30 30 30; /* Dark grey */
-    --secondary-foreground: 255 255 255;
+    --secondary-foreground: 255 255 255; /* Pure white text */
 
     --muted: 25 25 25;
-    --muted-foreground: 200 200 200; /* Lighter grey for better readability */
+    --muted-foreground: 255 255 255; /* Changed to pure white */
 
     --accent: 37 99 235; /* Deeper blue accent */
-    --accent-foreground: 255 255 255;
+    --accent-foreground: 255 255 255; /* Pure white text */
 
     --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
+    --destructive-foreground: 255 255 255; /* Pure white text */
 
     --border: 40 40 40;
     --input: 30 30 30;
@@ -48,32 +48,32 @@ body {
     --radius: 0.75rem;
 
     --sidebar-background: 15 15 15;
-    --sidebar-foreground: 255 255 255;
+    --sidebar-foreground: 255 255 255; /* Pure white text */
     --sidebar-primary: 59 130 246;
     --sidebar-primary-foreground: 0 0 0;
     --sidebar-accent: 37 99 235;
-    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-accent-foreground: 255 255 255; /* Pure white text */
     --sidebar-border: 40 40 40;
     --sidebar-ring: 59 130 246;
   }
 
   .dark {
     --background: 0 0 0;
-    --foreground: 255 255 255;
+    --foreground: 255 255 255; /* Pure white text */
     --card: 15 15 15;
-    --card-foreground: 255 255 255;
+    --card-foreground: 255 255 255; /* Pure white text */
     --popover: 20 20 20;
-    --popover-foreground: 255 255 255;
+    --popover-foreground: 255 255 255; /* Pure white text */
     --primary: 59 130 246;
     --primary-foreground: 0 0 0;
     --secondary: 30 30 30;
-    --secondary-foreground: 255 255 255;
+    --secondary-foreground: 255 255 255; /* Pure white text */
     --muted: 25 25 25;
-    --muted-foreground: 200 200 200;
+    --muted-foreground: 255 255 255; /* Changed to pure white */
     --accent: 37 99 235;
-    --accent-foreground: 255 255 255;
+    --accent-foreground: 255 255 255; /* Pure white text */
     --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
+    --destructive-foreground: 255 255 255; /* Pure white text */
     --border: 40 40 40;
     --input: 30 30 30;
     --ring: 59 130 246;
@@ -85,11 +85,11 @@ body {
     --chart-5: 30 58 138;
 
     --sidebar-background: 15 15 15;
-    --sidebar-foreground: 255 255 255;
+    --sidebar-foreground: 255 255 255; /* Pure white text */
     --sidebar-primary: 59 130 246;
     --sidebar-primary-foreground: 0 0 0;
     --sidebar-accent: 37 99 235;
-    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-accent-foreground: 255 255 255; /* Pure white text */
     --sidebar-border: 40 40 40;
     --sidebar-ring: 59 130 246;
   }
@@ -101,6 +101,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    color: #ffffff !important; /* Force pure white text */
     background: 
       /* Animated gradient backdrop */
       linear-gradient(135deg, 
@@ -135,6 +136,36 @@ body {
       0 0,
       0 0;
     animation: backgroundShift 20s ease-in-out infinite;
+  }
+
+  /* Force white text on all elements */
+  h1, h2, h3, h4, h5, h6, p, span, div, a, button, label, input, textarea {
+    color: #ffffff !important;
+  }
+
+  /* Override muted text to be white */
+  .text-muted-foreground {
+    color: #ffffff !important;
+    opacity: 0.8;
+  }
+
+  /* Ensure card text is white */
+  .text-card-foreground {
+    color: #ffffff !important;
+  }
+
+  /* Ensure foreground text is white */
+  .text-foreground {
+    color: #ffffff !important;
+  }
+
+  /* Button text overrides */
+  .text-primary {
+    color: rgb(59 130 246) !important;
+  }
+
+  .text-accent {
+    color: rgb(37 99 235) !important;
   }
 }
 
@@ -244,6 +275,7 @@ body {
     0 0 20px rgba(59, 130, 246, 0.6),
     0 0 30px rgba(59, 130, 246, 0.4),
     0 0 40px rgba(59, 130, 246, 0.2);
+  color: #ffffff !important;
 }
 
 .blue-glow {
@@ -327,10 +359,14 @@ body {
   left: 100%;
 }
 
-/* Improved text contrast */
+/* Pure white text classes */
 .text-white-glow {
-  color: #ffffff;
+  color: #ffffff !important;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.text-white-pure {
+  color: #ffffff !important;
 }
 
 /* Card hover effects */
@@ -356,4 +392,19 @@ body {
 @keyframes borderShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+/* Ensure all text elements are white */
+* {
+  color: #ffffff;
+}
+
+/* Override any remaining non-white text */
+.text-gray-500,
+.text-gray-400,
+.text-gray-600,
+.text-slate-500,
+.text-slate-400,
+.text-slate-600 {
+  color: #ffffff !important;
 }
