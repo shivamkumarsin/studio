@@ -2,7 +2,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; // Import Link
+import Link from "next/link"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Photo } from "@/types";
 import { motion } from "framer-motion";
@@ -40,7 +40,7 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
     >
       {photos.map((photo) => (
         <motion.div key={photo.id} variants={itemVariants}>
-          <Link href={`/photo/${photo.id}`} passHref legacyBehavior>
+          <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
             <a className="block h-full">
               <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out h-full flex flex-col group transform hover:-translate-y-1 bg-card hover:border-primary">
                 <CardHeader className="p-0 relative aspect-[4/3] w-full overflow-hidden">

@@ -2,13 +2,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; // Import Link
+import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Photo } from "@/types";
 import { CategoryIcon } from "./icons/category-icon";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trash2, Image as ImageIconPlaceholder } from "lucide-react"; 
+import { Trash2, Image as ImageIconPlaceholder, Eye } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,10 +20,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface PhotoGridProps {
   photos: Photo[];
-  onDelete?: (photoId: string) => void;
+  onDelete?: (photoId: string) => void; // For admin panel
 }
 
 export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
@@ -45,10 +54,10 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="group h-full" // Added h-full for consistent card height if rows wrap
+          className="group h-full"
         >
           <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col bg-card hover:border-primary">
-            <Link href={`/photo/${photo.id}`} passHref legacyBehavior>
+            <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
               <a className="block cursor-pointer">
                 <CardHeader className="p-0">
                   <div className="aspect-square relative w-full overflow-hidden">
@@ -65,7 +74,7 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
               </a>
             </Link>
             <CardContent className="p-4 flex-grow">
-               <Link href={`/photo/${photo.id}`} passHref legacyBehavior>
+              <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
                 <a className="block cursor-pointer">
                   <CardTitle className="font-headline text-lg mb-1 truncate text-card-foreground group-hover:text-primary" title={photo.name}>
                     {photo.name}
@@ -78,7 +87,7 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                 <CategoryIcon category={photo.category} className="mr-2 h-4 w-4 text-primary" />
                 <span className="font-body">{photo.category}</span>
               </div>
-              {onDelete && (
+              {onDelete ? ( // Admin context: show delete button
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
@@ -105,6 +114,12 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+              ) : ( // Public context: show view button/link
+                <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
+                  <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80" aria-label={`View photo ${photo.name}`}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </Link>
               )}
             </CardFooter>
           </Card>
