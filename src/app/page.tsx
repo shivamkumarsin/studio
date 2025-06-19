@@ -136,6 +136,9 @@ export default function PublicHomePage() {
                 <Mail className="mr-1.5 h-4 w-4" /> Contact
               </Button>
             </Link>
+             <Link href="/admin" legacyBehavior passHref>
+                <Button variant="ghost" className="text-sm md:text-base hover:text-primary">Admin</Button>
+            </Link>
           </nav>
         </div>
       </header>
@@ -155,7 +158,7 @@ export default function PublicHomePage() {
             sizes="100vw"
             priority
             className="pointer-events-none object-cover"
-            data-ai-hint="stars celebration"
+            data-ai-hint="hand stars gold"
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
@@ -340,5 +343,7 @@ export default function PublicHomePage() {
   );
 }
 
+
+    
 
     
