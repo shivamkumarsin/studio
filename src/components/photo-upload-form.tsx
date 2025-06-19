@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea"; // Added Textarea
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -17,15 +17,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { Photo, Category } from "@/types";
 import { APP_CATEGORIES } from "@/types";
-import { UploadCloud, FilesIcon } from "lucide-react";
+import { UploadCloud, FilesIcon, Edit3 } from "lucide-react";
 import { db, storage } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Progress } from "@/components/ui/progress";
 
+// Helper function to strip HTML tags
+function stripHtml(html: string): string {
+  if (typeof window === 'undefined') return html; // Should not happen client-side, but good practice
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
+
 export function PhotoUploadForm() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // For single file preview
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | "">(APP_CATEGORIES[0]);
   const [isUploading, setIsUploading] = useState(false);
@@ -45,7 +54,7 @@ export function PhotoUploadForm() {
         };
         reader.readAsDataURL(filesArray[0]);
       } else {
-        setPreviewUrl(null); // Clear single preview if multiple files
+        setPreviewUrl(null);
       }
     } else {
       setSelectedFiles([]);
@@ -56,6 +65,7 @@ export function PhotoUploadForm() {
   const resetForm = (formElement?: HTMLFormElement) => {
     setSelectedFiles([]);
     setPreviewUrl(null);
+    setTitle("");
     setDescription("");
     setSelectedCategory(APP_CATEGORIES[0]);
     setIsUploading(false);
@@ -68,10 +78,10 @@ export function PhotoUploadForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (selectedFiles.length === 0 || !selectedCategory) {
+    if (selectedFiles.length === 0 || !selectedCategory || !title.trim()) {
       toast({
         title: "Missing Information",
-        description: "Please select at least one photo and a category.",
+        description: "Please select at least one photo, provide a title, and select a category.",
         variant: "destructive",
       });
       return;
@@ -81,32 +91,30 @@ export function PhotoUploadForm() {
     setUploadProgress(0);
     let successfulUploads = 0;
     const totalFiles = selectedFiles.length;
+    const plainTextDescription = stripHtml(description);
+    const photoTitleWithPrefix = `Amrit Kumar Chanchal - ${title.trim()}`;
 
     for (let i = 0; i < totalFiles; i++) {
       const file = selectedFiles[i];
       setCurrentTaskMessage(`Uploading ${file.name} (${i + 1} of ${totalFiles})...`);
       
       try {
-        const storageRef = ref(storage, `photos/${Date.now()}_${file.name}`);
+        // Generate a unique filename for storage, but use the user-provided title for display
+        const uniqueStorageFilename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+        const storageRef = ref(storage, `photos/${uniqueStorageFilename}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
-
-        // Simplified progress for individual file (can be enhanced later if needed)
-        // For now, we show overall batch progress.
         
         await new Promise<void>((resolve, reject) => {
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              // This progress is for the current file, not the batch.
-              // To keep the UI simple, we're using a batch-level progress bar updated after each file.
+              // Batch-level progress bar updated after each file.
             },
             (error) => {
               console.error(`Firebase Storage Upload Error for ${file.name}:`, error);
-              let errorDescription = "Could not upload the photo. Please try again.";
-              // Simplified error handling for brevity in bulk upload
               toast({
                 title: `Upload Failed for ${file.name}`,
-                description: errorDescription,
+                description: "Could not upload the photo. Check console for Firebase Storage errors (permissions, CORS, bucket existence).",
                 variant: "destructive",
               });
               reject(error); 
@@ -114,29 +122,28 @@ export function PhotoUploadForm() {
             async () => {
               try {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                const photoDisplayName = `Amrit Kumar Chanchal - ${file.name}`;
-
+                
                 const photoData: Omit<Photo, "id" | "createdAt"> & { createdAt: any } = {
                   src: downloadURL,
-                  name: photoDisplayName,
+                  name: photoTitleWithPrefix, // User-defined title
                   category: selectedCategory,
-                  description: description || "", // Use current description for all files in batch or clear per file
+                  description: plainTextDescription,
                   createdAt: serverTimestamp(),
                 };
 
                 await addDoc(collection(db, "photos"), photoData);
                 toast({
                   title: "Photo Uploaded!",
-                  description: `${photoDisplayName} added to ${selectedCategory}.`,
-                  variant: "default", // Changed to default for success
+                  description: `"${photoTitleWithPrefix}" added to ${selectedCategory}.`,
+                  variant: "default",
                 });
                 successfulUploads++;
                 resolve();
               } catch (firestoreError) {
                  console.error(`Firestore Error for ${file.name}:`, firestoreError);
                  toast({
-                    title: `Error Saving ${file.name} Details`,
-                    description: "Photo uploaded, but failed to save details. Check console.",
+                    title: `Error Saving Details for "${photoTitleWithPrefix}"`,
+                    description: "Photo uploaded, but failed to save details to database. Check Firestore rules/console.",
                     variant: "destructive",
                  });
                  reject(firestoreError);
@@ -146,10 +153,7 @@ export function PhotoUploadForm() {
         });
         setUploadProgress(((i + 1) / totalFiles) * 100);
       } catch (error) {
-        // Error already handled by toast in uploadTask's error callback
-        // We can decide if we want to stop the batch or continue
         setCurrentTaskMessage(`Failed to upload ${file.name}. Continuing with next if any.`);
-        // Continue to next file
       }
     }
 
@@ -180,16 +184,16 @@ export function PhotoUploadForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="photo-upload" className="font-body text-md">Photo(s)</Label>
+            <Label htmlFor="photo-upload" className="font-body text-md">Photo File(s)</Label>
             <Input
               id="photo-upload"
               type="file"
               accept="image/*"
               onChange={handleFileChange}
               className="file:text-primary-foreground file:bg-primary hover:file:bg-primary/90"
-              required={selectedFiles.length === 0} // Required if no files are selected yet
+              required={selectedFiles.length === 0}
               disabled={isUploading}
-              multiple // Allow multiple file selection
+              multiple
             />
           </div>
 
@@ -213,16 +217,35 @@ export function PhotoUploadForm() {
             <div className="mt-4 p-3 border rounded-md text-center bg-muted/50">
               <FilesIcon className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">{selectedFiles.length} files selected.</p>
-              <p className="text-xs text-muted-foreground">The description below will apply to all selected photos.</p>
+              <p className="text-xs text-muted-foreground">The title and description below will apply to all selected photos.</p>
             </div>
           )}
 
+          <div className="space-y-2">
+            <Label htmlFor="photo-title" className="font-body text-md">
+              Photo Title <span className="text-destructive">*</span>
+            </Label>
+            <div className="flex items-center space-x-2">
+              <Edit3 className="h-5 w-5 text-muted-foreground" />
+              <Input
+                id="photo-title"
+                type="text"
+                placeholder="e.g., Sunset at Marina Beach"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                disabled={isUploading}
+                className="flex-1"
+              />
+            </div>
+             <p className="text-xs text-muted-foreground ml-7">Your name "Amrit Kumar Chanchal - " will be automatically added as a prefix.</p>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="description" className="font-body text-md">Description (Optional)</Label>
             <Textarea
               id="description"
-              placeholder="Tell a story about this photo/these photos..."
+              placeholder="Share your experience or details. HTML will be converted to plain text."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-[100px]"
@@ -263,3 +286,5 @@ export function PhotoUploadForm() {
     </Card>
   );
 }
+
+    
