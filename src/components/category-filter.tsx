@@ -1,10 +1,10 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import type { Category } from "@/types";
 import { APP_CATEGORIES, ALL_CATEGORIES_OPTION } from "@/types";
 import { CategoryIcon } from "./icons/category-icon";
+import { motion } from "framer-motion";
 
 interface CategoryFilterProps {
   selectedCategory: Category | typeof ALL_CATEGORIES_OPTION;
@@ -14,26 +14,68 @@ interface CategoryFilterProps {
 const displayCategories = [ALL_CATEGORIES_OPTION, ...APP_CATEGORIES];
 
 export function CategoryFilter({ selectedCategory, onSelectCategory }: CategoryFilterProps) {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: "spring", stiffness: 120, damping: 10 }
+    }
+  };
+
   return (
-    <div className="py-4 px-2 md:px-0">
-      {/* Title moved to page.tsx for better semantic structure */}
-      {/* <h2 className="text-xl font-headline mb-3 text-center md:text-left">Filter by Category</h2> */}
-      <div className="flex flex-wrap justify-center gap-2">
+    <div className="py-6 px-2 md:px-0">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-wrap justify-center gap-3"
+      >
         {displayCategories.map((category) => (
-          <Button
-            key={category}
-            variant={selectedCategory === category ? "default" : "outline"}
-            onClick={() => onSelectCategory(category as Category | typeof ALL_CATEGORIES_OPTION)}
-            className={`font-body shadow-sm transition-all duration-200 ease-in-out transform hover:scale-105 rounded-full text-sm px-4 py-2 md:px-5 md:py-2.5 ${
-              selectedCategory === category ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground'
-            }`}
-            aria-pressed={selectedCategory === category}
-          >
-            <CategoryIcon category={category} className="mr-2 h-4 w-4" />
-            {category}
-          </Button>
+          <motion.div key={category} variants={itemVariants}>
+            <Button
+              variant={selectedCategory === category ? "default" : "outline"}
+              onClick={() => onSelectCategory(category as Category | typeof ALL_CATEGORIES_OPTION)}
+              className={`
+                font-medium shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 
+                rounded-full text-sm px-6 py-3 border-2 relative overflow-hidden group
+                ${selectedCategory === category 
+                  ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground border-primary shadow-primary/25 animate-glow' 
+                  : 'border-primary/30 text-primary hover:border-primary hover:bg-primary/10 hover:text-primary glass'
+                }
+              `}
+              aria-pressed={selectedCategory === category}
+            >
+              {/* Shimmer effect for active button */}
+              {selectedCategory === category && (
+                <div className="absolute inset-0 shimmer"></div>
+              )}
+              
+              <div className="relative flex items-center gap-2">
+                <CategoryIcon 
+                  category={category} 
+                  className={`h-4 w-4 transition-transform duration-300 group-hover:scale-110 ${
+                    selectedCategory === category ? 'animate-pulse' : ''
+                  }`} 
+                />
+                <span className="font-semibold">{category}</span>
+              </div>
+
+              {/* Hover glow effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+            </Button>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
