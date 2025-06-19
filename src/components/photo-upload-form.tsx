@@ -74,12 +74,13 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           if (snapshot.totalBytes > 0) {
             progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
-            progress = 100;
+            // This case might happen for very small files or specific scenarios
+            progress = 100; 
           }
           setUploadProgress(progress);
         },
         (error) => {
-          console.error("Firebase Storage Upload Error:", error); // More detailed logging
+          console.error("Firebase Storage Upload Error:", error); 
           let description = "Could not upload the photo. Please try again.";
           if (error.code) {
             switch (error.code) {
@@ -90,10 +91,13 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
                 description = "Upload canceled.";
                 break;
               case 'storage/unknown':
-                description = "An unknown error occurred during upload. Check console for details.";
+                description = "An unknown error occurred during upload. This might be a CORS issue. Please verify your Firebase Storage CORS configuration allows requests from your deployment URL. Check console for details.";
                 break;
+              case 'storage/object-not-found': // Can also be a symptom if preflight for CORS fails
+                 description = "File not found during upload, or possibly a CORS preflight issue. Check Firebase Storage CORS configuration for your deployment URL and console for details.";
+                 break;
               default:
-                description = `Upload error: ${error.message}`;
+                description = `Upload error: ${error.message}. If this persists, check Firebase Storage CORS configuration.`;
             }
           }
           toast({
@@ -126,14 +130,16 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
             // Reset form
             setSelectedFile(null);
             setPreviewUrl(null);
-            (event.target as HTMLFormElement).reset(); 
+            if (event.target instanceof HTMLFormElement) {
+              event.target.reset();
+            }
             setIsUploading(false);
             setUploadProgress(0);
           } catch (firestoreError) {
              console.error("Firestore Document Creation Error:", firestoreError);
              toast({
                 title: "Error Saving Photo Details",
-                description: "Photo uploaded, but failed to save details. Check console.",
+                description: "Photo uploaded, but failed to save details to database. Check console.",
                 variant: "destructive",
              });
              setIsUploading(false);
@@ -144,7 +150,7 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
       console.error("General Error in handleSubmit for photo upload:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred during upload. Check console.",
+        description: "An unexpected error occurred during upload. Check console and Firebase Storage CORS configuration.",
         variant: "destructive",
       });
       setIsUploading(false);
@@ -212,7 +218,7 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
           <Button 
             type="submit" 
             className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-body text-lg py-3"
-            disabled={isUploading}
+            disabled={isUploading || !selectedFile}
           >
             {isUploading ? "Uploading..." : "Upload Photo"}
           </Button>
@@ -221,3 +227,4 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
     </Card>
   );
 }
+
