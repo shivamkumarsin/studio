@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Photo Album Chronicles',
-  description: 'Your personal photo album, beautifully organized.',
+  title: "Amrit's Photo Stack",
+  description: "Amrit's personal photo stack, beautifully organized.",
 };
 
 export default function RootLayout({
