@@ -70,7 +70,14 @@ export function PhotoUploadForm({ onPhotoAdd }: PhotoUploadFormProps) {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          let progress = 0;
+          if (snapshot.totalBytes > 0) {
+            progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          } else if (snapshot.bytesTransferred > 0 && snapshot.totalBytes === 0) {
+            // This case is unusual, might indicate completion of an initially unknown size
+            progress = 100;
+          }
+          // If snapshot.bytesTransferred is 0 and snapshot.totalBytes is 0, progress remains 0.
           setUploadProgress(progress);
         },
         (error) => {
