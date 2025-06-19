@@ -137,7 +137,7 @@ export default function PublicHomePage() {
         <div className="absolute inset-0 opacity-5 md:opacity-10 z-0">
           <Image
             src="https://placehold.co/1920x1080.png"
-            alt="Abstract photography background"
+            alt="Abstract photography background by Amrit Kumar Chanchal"
             layout="fill"
             objectFit="cover"
             data-ai-hint="abstract dark texture"
