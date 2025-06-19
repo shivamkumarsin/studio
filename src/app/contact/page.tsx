@@ -10,7 +10,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
             <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
-            Amrit K. Chanchal
+            Amrit's Photo Stack
           </Link>
           <nav className="flex items-center gap-1 md:gap-3">
             <Link href="/" legacyBehavior passHref>

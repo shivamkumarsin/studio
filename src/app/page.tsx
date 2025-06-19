@@ -11,7 +11,7 @@ import type { Photo, Category, SiteSettings } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, Star, ChevronDown, UserCircle, Home } from "lucide-react";
+import { Camera, Mail, Star, ChevronDown, UserCircle } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit, doc, getDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -112,18 +112,18 @@ export default function PublicHomePage() {
       : photos.filter((photo) => photo.category === selectedCategory);
 
   const heroVariants = {
-    hidden: { opacity: 0, y: -50 },
+    hidden: { opacity: 0 },
     visible: { 
-      opacity: 1, y: 0,
-      transition: { staggerChildren: 0.2, delayChildren: 0.1, duration: 0.6, ease: "easeOut" }
+      opacity: 1,
+      transition: { staggerChildren: 0.25, delayChildren: 0.1, duration: 0.6, ease: "easeOut" }
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: { 
       opacity: 1, y: 0,
-      transition: { type: "spring", stiffness: 100, damping: 12 }
+      transition: { type: "spring", stiffness: 90, damping: 15 }
     },
   };
 
@@ -140,7 +140,7 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
             <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
-            Amrit K. Chanchal
+            Amrit's Photo Stack
           </Link>
           <nav className="flex items-center gap-1 md:gap-3">
             <Button variant="ghost" onClick={() => scrollToSection('weekly-highlights-section')} className="text-sm md:text-base hover:text-primary">
