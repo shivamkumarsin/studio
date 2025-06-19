@@ -9,9 +9,11 @@ import { PhotoGrid } from "@/components/photo-grid";
 import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Wifi, WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc, getCountFromServer } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 
 
@@ -20,6 +22,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<Category | typeof ALL_CATEGORIES_OPTION>(ALL_CATEGORIES_OPTION);
   const { toast } = useToast();
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -36,8 +39,8 @@ export default function AdminPage() {
     }, (error) => {
       console.error("Error fetching photos from Firestore:", error);
       toast({
-        title: "Error",
-        description: "Could not fetch photos. Please try again later.",
+        title: "Error Fetching Photos",
+        description: "Could not fetch photos from Firestore. Please check your connection or Firebase setup.",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -48,20 +51,15 @@ export default function AdminPage() {
 
 
   const handlePhotoDelete = async (photoId: string) => {
-    // Note: This is a placeholder. Actual deletion from Firebase will be added next.
-    // For now, it removes from local state for UI feedback.
-    // In a real Firebase scenario, onSnapshot would update the UI automatically.
-     const photoToDelete = photos.find(p => p.id === photoId);
+    const photoToDelete = photos.find(p => p.id === photoId);
     if (!photoToDelete) {
       toast({ title: "Error", description: "Photo not found.", variant: "destructive" });
       return;
     }
 
     try {
-      // Delete from Firestore
       await deleteDoc(doc(db, "photos", photoId));
       
-      // Delete from Firebase Storage if src is a Firebase Storage URL
       if (photoToDelete.src.includes("firebasestorage.googleapis.com")) {
         const storage = getStorage();
         const photoRef = ref(storage, photoToDelete.src);
@@ -70,9 +68,8 @@ export default function AdminPage() {
       
       toast({
         title: "Photo Deleted",
-        description: "The photo has been removed.",
+        description: `"${photoToDelete.name}" has been removed.`,
       });
-      // No need to setPhotos here, onSnapshot will update the list
     } catch (error) {
       console.error("Error deleting photo:", error);
       toast({
@@ -80,6 +77,28 @@ export default function AdminPage() {
         description: "Could not remove the photo. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleTestFirebaseConnection = async () => {
+    setIsTestingConnection(true);
+    try {
+      const photosCollection = collection(db, "photos");
+      await getCountFromServer(photosCollection); // Simple read operation
+      toast({
+        title: "Firebase Connection OK",
+        description: "Successfully connected to Firestore and accessed the photos collection.",
+        variant: "default", // Explicitly default, though it is the default
+      });
+    } catch (error) {
+      console.error("Firebase connection test failed:", error);
+      toast({
+        title: "Firebase Connection Error",
+        description: "Could not connect to Firestore or access the photos collection. Check console for details.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTestingConnection(false);
     }
   };
 
@@ -99,6 +118,27 @@ export default function AdminPage() {
 
       <section aria-labelledby="gallery-section-title" className="md:col-span-2">
         <h2 id="gallery-section-title" className="sr-only">Photo Gallery Management</h2>
+        
+        <div className="mb-4 p-4 border rounded-lg shadow-sm bg-card">
+          <h3 className="text-lg font-semibold mb-2 text-card-foreground">Firebase Status</h3>
+          <Button onClick={handleTestFirebaseConnection} disabled={isTestingConnection} variant="outline" className="w-full sm:w-auto">
+            {isTestingConnection ? (
+              <>
+                <WifiOff className="mr-2 h-4 w-4 animate-pulse" />
+                Testing Connection...
+              </>
+            ) : (
+              <>
+                <Wifi className="mr-2 h-4 w-4" />
+                Test Firebase Connection
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-muted-foreground mt-2">
+            Click this button to perform a quick check if the application can connect to your Firebase Firestore database.
+          </p>
+        </div>
+        
         <CategoryFilter
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
