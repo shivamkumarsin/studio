@@ -1,24 +1,19 @@
 
-"use client"; // Required because we use useAuth hook
+"use client"; 
 
-import { useEffect } from 'react'; // Import useEffect
-import type { Metadata } from 'next'; // Keep for potential static metadata
-import { Camera, LogOut } from "lucide-react";
+import { useEffect } from 'react'; 
+import { Images, LogOut } from "lucide-react"; // Changed Camera to Images
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/auth-context"; // Import useAuth
-import { useRouter } from 'next/navigation'; // To redirect
+import { useAuth } from "@/contexts/auth-context"; 
+import { useRouter } from 'next/navigation'; 
 
-// export const metadata: Metadata = { // This needs to be static if used
-//   title: "Admin - Amrit's Photo Stack",
-//   description: "Admin panel for Amrit's Photo Stack.",
-// };
 
 export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, signOut, loading } = useAuth(); // Use the auth context
+  const { user, signOut, loading } = useAuth(); 
   const router = useRouter();
 
   useEffect(() => {
@@ -27,10 +22,10 @@ export default function AdminLayout({
     }
   }, [loading, user, router]);
 
-  // Handle logout
+  
   const handleSignOut = async () => {
     await signOut();
-    // signOut in AuthProvider already redirects to /login
+    
   };
 
   if (loading) {
@@ -41,7 +36,7 @@ export default function AdminLayout({
     );
   }
 
-  // If user is null even after loading (e.g., during redirection by useEffect), show a message
+  
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -50,7 +45,7 @@ export default function AdminLayout({
     );
   }
   
-  // Check if the authenticated user is the allowed admin
+  
   if (user.email !== 'amritkumarchanchal@gmail.com') {
      return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background text-center p-4">
@@ -67,10 +62,10 @@ export default function AdminLayout({
       <header className="bg-primary text-primary-foreground py-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <h1 className="text-2xl md:text-3xl font-headline flex items-center gap-3">
-            <Camera className="h-8 w-8" />
+            <Images className="h-8 w-8" /> {/* Changed Camera to Images */}
             Amrit's Photo Stack - Admin
           </h1>
-          {user && ( // Show sign out button if user is logged in
+          {user && ( 
             <Button onClick={handleSignOut} variant="ghost" className="hover:bg-primary/80">
               <LogOut className="mr-2 h-5 w-5" />
               Sign Out

@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Mail, Home, Camera } from 'lucide-react';
+import { Mail, Home, Images } from 'lucide-react'; // Changed Camera to Images
 
 export default function ContactPage() {
   return (
@@ -9,7 +9,7 @@ export default function ContactPage() {
       <header className="bg-card text-card-foreground py-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
+            <Images className="h-7 w-7 md:h-8 md:w-8 text-primary" /> {/* Changed Camera to Images */}
             Amrit's Photo Stack
           </Link>
           <nav className="flex items-center gap-1 md:gap-3">
@@ -55,7 +55,7 @@ export default function ContactPage() {
       <footer className="bg-secondary text-secondary-foreground py-8 mt-auto">
         <div className="container mx-auto px-4 text-center">
             <Link href="/" className="text-xl font-headline flex items-center justify-center gap-2 hover:opacity-80 transition-opacity mb-2">
-              <Camera className="h-6 w-6 text-primary" />
+              <Images className="h-6 w-6 text-primary" /> {/* Changed Camera to Images */}
               Amrit's Photo Stack
             </Link>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">

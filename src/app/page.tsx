@@ -11,11 +11,13 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, Star, ChevronDown, UserCircle } from "lucide-react";
+import { Images, Mail, Star, ChevronDown, UserCircle } from "lucide-react"; // Changed Camera to Images
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { WeeklyHighlights } from "@/components/weekly-highlights";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
 
 const HERO_BACKDROP_IMAGE_URL = "https://placehold.co/1920x1080.png";
 const PROFILE_IMAGE_URL = "https://certify.amritkumarchanchal.me/amrit-kumar-chanchal.png";
@@ -28,6 +30,7 @@ export default function PublicHomePage() {
   const [highlightPhotos, setHighlightPhotos] = useState<Photo[]>([]);
   const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
   const { toast } = useToast();
+  const [selectedPhotoForModal, setSelectedPhotoForModal] = useState<Photo | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -85,15 +88,15 @@ export default function PublicHomePage() {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.1, duration: 0.5, ease: "easeOut" }
+      transition: { staggerChildren: 0.1, delayChildren: 0.1, duration: 0.5, ease: "easeOut" }
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, y: 0,
-      transition: { type: "spring", stiffness: 90, damping: 15 }
+      transition: { type: "spring", stiffness: 80, damping: 12 }
     },
   };
 
@@ -101,12 +104,21 @@ export default function PublicHomePage() {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openPhotoModal = (photo: Photo) => {
+    setSelectedPhotoForModal(photo);
+  };
+
+  const closePhotoModal = () => {
+    setSelectedPhotoForModal(null);
+  };
+
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="bg-card text-card-foreground py-4 shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="text-2xl md:text-3xl font-headline flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-            <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
+            <Images className="h-7 w-7 md:h-8 md:w-8 text-primary" /> {/* Changed Camera to Images */}
             Amrit's Photo Stack
           </Link>
           <nav className="flex items-center gap-1 md:gap-3">
@@ -192,7 +204,7 @@ export default function PublicHomePage() {
               <p className="text-xl font-body text-muted-foreground">Loading highlights...</p>
             </div>
           ) : highlightPhotos.length > 0 ? (
-            <WeeklyHighlights photos={highlightPhotos} />
+            <WeeklyHighlights photos={highlightPhotos} onPhotoClick={openPhotoModal} />
           ) : (
             <p className="text-center text-muted-foreground">Fresh shots coming soon. Check back later!</p>
           )}
@@ -265,7 +277,7 @@ export default function PublicHomePage() {
             <p className="text-xl font-body text-muted-foreground">Loading photos from Firebase...</p>
           </div>
         ) : (
-           <PhotoGrid photos={filteredPhotos} />
+           <PhotoGrid photos={filteredPhotos} onPhotoClick={openPhotoModal} />
         )}
       </main>
 
@@ -273,7 +285,7 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 text-center">
           <div className="flex flex-col items-center mb-4">
             <Link href="/" className="text-xl font-headline flex items-center gap-2 hover:opacity-80 transition-opacity mb-2">
-              <Camera className="h-6 w-6 text-primary" />
+              <Images className="h-6 w-6 text-primary" /> {/* Changed Camera to Images */}
               Amrit's Photo Stack
             </Link>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -295,6 +307,35 @@ export default function PublicHomePage() {
           </p>
         </div>
       </footer>
+       {selectedPhotoForModal && (
+        <Dialog open={!!selectedPhotoForModal} onOpenChange={(isOpen) => { if (!isOpen) closePhotoModal(); }}>
+          <DialogContent className="max-w-3xl w-full p-0">
+            <DialogHeader className="p-4 border-b">
+              <DialogTitle className="text-xl font-headline">{selectedPhotoForModal.name}</DialogTitle>
+               {selectedPhotoForModal.description && (
+                <DialogDescription className="text-sm text-muted-foreground whitespace-pre-wrap pt-1">
+                  {selectedPhotoForModal.description}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+            <div className="p-1 bg-muted/50 max-h-[70vh] overflow-y-auto flex justify-center items-center">
+               <div className="relative w-full aspect-[4/3] max-w-full max-h-full">
+                <Image
+                  src={selectedPhotoForModal.src}
+                  alt={`${selectedPhotoForModal.name} - Photo by Amrit Kumar Chanchal`}
+                  fill
+                  sizes="(max-width: 768px) 90vw, (max-width: 1200px) 70vw, 800px"
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <div className="p-4 border-t flex justify-end">
+                <Button variant="outline" onClick={closePhotoModal}>Close</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
+
