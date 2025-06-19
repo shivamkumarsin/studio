@@ -22,3 +22,9 @@ export const APP_CATEGORIES = [
 export type Category = typeof APP_CATEGORIES[number];
 
 export const ALL_CATEGORIES_OPTION = "All Categories";
+
+export interface SiteSettings {
+  profilePhotoUrl?: string;
+  heroBackdropUrl?: string;
+  updatedAt?: Timestamp;
+}
