@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import type { Photo } from '@/types';
 
-const PRODUCTION_URL = 'https://amritbitla.netlify.app';
+const PRODUCTION_URL = 'https://pics.amritkumarchanchal.me';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
@@ -37,3 +37,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...staticRoutes, ...photoRoutes];
 }
+
