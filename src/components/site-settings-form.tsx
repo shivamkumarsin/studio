@@ -11,11 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { db, storage } from "@/lib/firebase";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { UploadCloud, Image as ImageIcon, User, RefreshCw } from "lucide-react";
+import { User, ImageIcon as ImageIconLucide, RefreshCw } from "lucide-react"; // Renamed ImageIcon to avoid conflict
 import type { SiteSettings } from "@/types";
 import { Progress } from "@/components/ui/progress";
 
 const DEFAULT_PLACEHOLDER = "https://placehold.co/600x400.png";
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 export function SiteSettingsForm() {
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
@@ -43,13 +45,20 @@ export function SiteSettingsForm() {
       if (docSnap.exists()) {
         const settings = docSnap.data() as SiteSettings;
         setCurrentProfilePhotoUrl(settings.profilePhotoUrl || null);
-        setProfilePhotoPreview(settings.profilePhotoUrl || null);
+        // Only set preview from current URL if no file is selected for preview
+        if (!profilePhotoFile) setProfilePhotoPreview(settings.profilePhotoUrl || null);
+        
         setCurrentHeroBackdropUrl(settings.heroBackdropUrl || null);
-        setHeroBackdropPreview(settings.heroBackdropUrl || null);
+        if (!heroBackdropFile) setHeroBackdropPreview(settings.heroBackdropUrl || null);
+
+      } else {
+        // If no settings, ensure previews are also cleared or default
+        if (!profilePhotoFile) setProfilePhotoPreview(null);
+        if (!heroBackdropFile) setHeroBackdropPreview(null);
       }
     } catch (error) {
       console.error("Error fetching site settings:", error);
-      toast({ title: "Error loading current settings", variant: "destructive" });
+      toast({ title: "Error loading current settings", description: "Could not fetch existing site appearance settings.", variant: "destructive" });
     } finally {
       setIsLoadingSettings(false);
     }
@@ -58,26 +67,37 @@ export function SiteSettingsForm() {
   useEffect(() => {
     fetchSiteSettings();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // profilePhotoFile and heroBackdropFile are intentionally omitted to prevent re-fetch on file selection
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    setter: React.Dispatch<React.SetStateAction<File | null>>,
-    previewSetter: React.Dispatch<React.SetStateAction<string | null>>
+    fileSetter: React.Dispatch<React.SetStateAction<File | null>>,
+    previewSetter: React.Dispatch<React.SetStateAction<string | null>>,
+    currentUrlForReset: string | null
   ) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setter(file);
+    const inputEl = event.target;
+    if (inputEl.files && inputEl.files[0]) {
+      const file = inputEl.files[0];
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        toast({
+          title: "File Too Large",
+          description: `Maximum file size is ${MAX_FILE_SIZE_MB}MB. "${file.name}" was not selected.`,
+          variant: "destructive",
+        });
+        inputEl.value = ""; // Clear the input
+        fileSetter(null);
+        previewSetter(currentUrlForReset); // Revert preview to current one
+        return;
+      }
+      fileSetter(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         previewSetter(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
-      setter(null);
-      // Revert to current URL if file is deselected, or null if none
-      if (setter === setProfilePhotoFile) previewSetter(currentProfilePhotoUrl);
-      if (setter === setHeroBackdropFile) previewSetter(currentHeroBackdropUrl);
+      fileSetter(null);
+      previewSetter(currentUrlForReset); // Revert to current URL if file is deselected
     }
   };
 
@@ -85,20 +105,34 @@ export function SiteSettingsForm() {
     file: File | null,
     storagePath: string,
     fieldName: keyof SiteSettings,
-    setIsUploading: React.Dispatch<React.SetStateAction<boolean>>,
-    setProgress: React.Dispatch<React.SetStateAction<number>>,
-    successMessage: string
+    setIsUploadingState: React.Dispatch<React.SetStateAction<boolean>>,
+    setProgressState: React.Dispatch<React.SetStateAction<number>>,
+    successMessage: string,
+    inputId: string,
+    fileStateSetter: React.Dispatch<React.SetStateAction<File | null>>,
+    previewStateSetter: React.Dispatch<React.SetStateAction<string | null>>,
+    currentUrlForReset: string | null
   ) => {
     if (!file) {
       toast({ title: "No file selected", description: "Please select a file to upload.", variant: "destructive" });
       return;
     }
 
-    setIsUploading(true);
-    setProgress(0);
+    // Redundant size check, handleFileChange should catch it, but good for safety.
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast({ title: "File Too Large", description: `File exceeds ${MAX_FILE_SIZE_MB}MB.`, variant: "destructive" });
+      const inputElement = document.getElementById(inputId) as HTMLInputElement;
+      if (inputElement) inputElement.value = "";
+      fileStateSetter(null);
+      previewStateSetter(currentUrlForReset);
+      return;
+    }
+
+    setIsUploadingState(true);
+    setProgressState(0);
 
     try {
-      const fileRef = ref(storage, storagePath);
+      const fileRef = ref(storage, storagePath); // Fixed path means overwrite
       const uploadTask = uploadBytesResumable(fileRef, file);
 
       await new Promise<void>((resolve, reject) => {
@@ -106,41 +140,95 @@ export function SiteSettingsForm() {
           "state_changed",
           (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setProgress(progress);
+            setProgressState(Math.round(progress));
           },
           (error) => {
-            console.error("Upload error:", error);
-            toast({ title: "Upload Failed", description: error.message, variant: "destructive" });
+            console.error("Firebase Storage Upload Error:", error);
+            let description = "Could not upload the file. Please try again.";
+            if (error.code === 'storage/unauthorized') {
+              description = "Upload failed: Permission denied. Check Firebase Storage rules.";
+            } else if (error.code === 'storage/canceled') {
+              description = "Upload was canceled.";
+            } else if (error.code === 'storage/quota-exceeded') {
+              description = `Upload failed: Storage quota exceeded. Max file size is ${MAX_FILE_SIZE_MB}MB.`;
+            } else if (error.message.includes('max file size')) { // Catch from rules potentially
+               description = `Upload failed: File is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
+            }
+            toast({ title: "Upload Failed", description, variant: "destructive" });
             reject(error);
           },
-          async () => {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            await setDoc(settingsDocRef, { [fieldName]: downloadURL, updatedAt: serverTimestamp() }, { merge: true });
-            toast({ title: "Success!", description: successMessage });
-            await fetchSiteSettings(); // Refresh current images
-            resolve();
+          async () => { // Upload complete
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              await setDoc(settingsDocRef, { [fieldName]: downloadURL, updatedAt: serverTimestamp() }, { merge: true });
+              
+              toast({ title: "Success!", description: successMessage });
+              fileStateSetter(null); // Clear the selected file state first
+
+              await fetchSiteSettings(); // Refresh all settings (this will update previews)
+              resolve();
+            } catch (firestoreOrFetchError) {
+                console.error("Error saving settings or refreshing post-upload:", firestoreOrFetchError);
+                toast({ title: "Processing Error", description: "Photo uploaded, but failed to finalize settings. Please check the console.", variant: "destructive" });
+                reject(firestoreOrFetchError); // Propagate to outer catch
+            }
           }
         );
       });
-    } catch (error) {
-      // Error already handled by toast in promise reject
+    } catch (uploadError) {
+      // Errors from the promise (upload or post-upload processing) are caught here.
+      // Toasts are generally handled by reject handlers within the promise.
+      // This primarily catches errors if the promise itself couldn't be constructed or an unexpected error.
+      console.error("Overall error in handleUpload:", uploadError);
     } finally {
-      setIsUploading(false);
-      setProgress(0);
-       // Clear the file input after upload
-      if (fieldName === 'profilePhotoUrl') setProfilePhotoFile(null);
-      if (fieldName === 'heroBackdropUrl') setHeroBackdropFile(null);
+      setIsUploadingState(false);
+      setProgressState(0);
+      const inputElement = document.getElementById(inputId) as HTMLInputElement;
+      if (inputElement) inputElement.value = ""; // Ensure input is cleared
+
+      // If the file state is still set (e.g., upload failed before clearing), clear it now
+      // and revert preview to the last known good URL.
+      if (fileStateSetter === setProfilePhotoFile && profilePhotoFile) {
+         setProfilePhotoFile(null);
+         setProfilePhotoPreview(currentProfilePhotoUrl);
+      }
+      if (fileStateSetter === setHeroBackdropFile && heroBackdropFile) {
+         setHeroBackdropFile(null);
+         setHeroBackdropPreview(currentHeroBackdropUrl);
+      }
     }
   };
   
   const handleSubmitProfilePhoto = (e: FormEvent) => {
     e.preventDefault();
-    handleUpload(profilePhotoFile, "site_assets/profile_photo", "profilePhotoUrl", setIsUploadingProfile, setProfileUploadProgress, "Profile photo updated.");
+    handleUpload(
+      profilePhotoFile, 
+      "site_assets/profile_photo", // Fixed name implies overwrite
+      "profilePhotoUrl", 
+      setIsUploadingProfile, 
+      setProfileUploadProgress, 
+      "Profile photo updated successfully.",
+      "profile-photo-upload",
+      setProfilePhotoFile,
+      setProfilePhotoPreview,
+      currentProfilePhotoUrl
+    );
   };
 
   const handleSubmitHeroBackdrop = (e: FormEvent) => {
     e.preventDefault();
-    handleUpload(heroBackdropFile, "site_assets/hero_backdrop", "heroBackdropUrl", setIsUploadingBackdrop, setBackdropUploadProgress, "Hero backdrop updated.");
+    handleUpload(
+      heroBackdropFile, 
+      "site_assets/hero_backdrop", // Fixed name implies overwrite
+      "heroBackdropUrl", 
+      setIsUploadingBackdrop, 
+      setBackdropUploadProgress, 
+      "Hero backdrop updated successfully.",
+      "hero-backdrop-upload",
+      setHeroBackdropFile,
+      setHeroBackdropPreview,
+      currentHeroBackdropUrl
+    );
   };
 
 
@@ -148,7 +236,7 @@ export function SiteSettingsForm() {
     return (
       <Card className="w-full shadow-lg">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl flex items-center gap-2">
+          <CardTitle className="font-headline text-xl flex items-center gap-2">
             <RefreshCw className="animate-spin text-primary" /> Loading Site Settings...
           </CardTitle>
         </CardHeader>
@@ -167,7 +255,7 @@ export function SiteSettingsForm() {
           <CardTitle className="font-headline text-xl flex items-center gap-2">
             <User className="text-primary" /> Manage Profile Photo
           </CardTitle>
-          <CardDescription>This photo appears in the "About Me" section on your homepage.</CardDescription>
+          <CardDescription>This photo appears in the "About Me" section. Max file size: {MAX_FILE_SIZE_MB}MB.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmitProfilePhoto}>
           <CardContent className="space-y-4">
@@ -177,8 +265,9 @@ export function SiteSettingsForm() {
                 id="profile-photo-upload"
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFileChange(e, setProfilePhotoFile, setProfilePhotoPreview)}
+                onChange={(e) => handleFileChange(e, setProfilePhotoFile, setProfilePhotoPreview, currentProfilePhotoUrl)}
                 disabled={isUploadingProfile}
+                className="file:text-primary-foreground file:bg-primary hover:file:bg-primary/90"
               />
             </div>
             {(profilePhotoPreview || currentProfilePhotoUrl) && (
@@ -189,21 +278,22 @@ export function SiteSettingsForm() {
                   alt="Profile photo preview"
                   width={200}
                   height={200}
-                  className="mt-2 rounded-md object-cover aspect-square border shadow-sm"
+                  className="mt-2 rounded-lg object-cover aspect-square border shadow-md"
                   data-ai-hint="profile avatar"
+                  key={profilePhotoPreview || currentProfilePhotoUrl || 'profile_fallback'} // Key for re-render on src change
                 />
               </div>
             )}
             {isUploadingProfile && (
               <div className="space-y-1">
                 <Progress value={profileUploadProgress} className="w-full" />
-                <p className="text-sm text-muted-foreground text-center">{Math.round(profileUploadProgress)}%</p>
+                <p className="text-sm text-muted-foreground text-center">{profileUploadProgress}%</p>
               </div>
             )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isUploadingProfile || !profilePhotoFile}>
-              {isUploadingProfile ? "Uploading..." : "Save Profile Photo"}
+            <Button type="submit" disabled={isUploadingProfile || !profilePhotoFile} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              {isUploadingProfile ? "Uploading Profile Photo..." : "Save Profile Photo"}
             </Button>
           </CardFooter>
         </form>
@@ -212,9 +302,9 @@ export function SiteSettingsForm() {
       <Card className="w-full shadow-lg">
         <CardHeader>
           <CardTitle className="font-headline text-xl flex items-center gap-2">
-            <ImageIcon className="text-primary" /> Manage Hero Backdrop Image
+            <ImageIconLucide className="text-primary" /> Manage Hero Backdrop Image
           </CardTitle>
-          <CardDescription>This is the large background image on your homepage hero section.</CardDescription>
+          <CardDescription>Large background image for the homepage hero. Max file size: {MAX_FILE_SIZE_MB}MB.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmitHeroBackdrop}>
           <CardContent className="space-y-4">
@@ -224,8 +314,9 @@ export function SiteSettingsForm() {
                 id="hero-backdrop-upload"
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFileChange(e, setHeroBackdropFile, setHeroBackdropPreview)}
+                onChange={(e) => handleFileChange(e, setHeroBackdropFile, setHeroBackdropPreview, currentHeroBackdropUrl)}
                 disabled={isUploadingBackdrop}
+                className="file:text-primary-foreground file:bg-primary hover:file:bg-primary/90"
               />
             </div>
             {(heroBackdropPreview || currentHeroBackdropUrl) && (
@@ -236,21 +327,22 @@ export function SiteSettingsForm() {
                   alt="Hero backdrop preview"
                   width={300}
                   height={150}
-                  className="mt-2 rounded-md object-cover aspect-[2/1] border shadow-sm"
+                  className="mt-2 rounded-lg object-cover aspect-[2/1] border shadow-md"
                   data-ai-hint="abstract background"
+                  key={heroBackdropPreview || currentHeroBackdropUrl || 'hero_fallback'} // Key for re-render
                 />
               </div>
             )}
             {isUploadingBackdrop && (
               <div className="space-y-1">
                 <Progress value={backdropUploadProgress} className="w-full" />
-                <p className="text-sm text-muted-foreground text-center">{Math.round(backdropUploadProgress)}%</p>
+                <p className="text-sm text-muted-foreground text-center">{backdropUploadProgress}%</p>
               </div>
             )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isUploadingBackdrop || !heroBackdropFile}>
-              {isUploadingBackdrop ? "Uploading..." : "Save Hero Backdrop"}
+            <Button type="submit" disabled={isUploadingBackdrop || !heroBackdropFile} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              {isUploadingBackdrop ? "Uploading Backdrop..." : "Save Hero Backdrop"}
             </Button>
           </CardFooter>
         </form>
@@ -258,3 +350,5 @@ export function SiteSettingsForm() {
     </div>
   );
 }
+
+    
