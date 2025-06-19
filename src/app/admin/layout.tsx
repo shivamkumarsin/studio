@@ -1,6 +1,7 @@
 
 "use client"; // Required because we use useAuth hook
 
+import { useEffect } from 'react'; // Import useEffect
 import type { Metadata } from 'next'; // Keep for potential static metadata
 import { Camera, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,6 @@ import { useRouter } from 'next/navigation'; // To redirect
 //   title: "Admin - Amrit's Photo Stack",
 //   description: "Admin panel for Amrit's Photo Stack.",
 // };
-// If you need dynamic title based on auth, you'd set it in the page component or useEffect.
 
 export default function AdminLayout({
   children,
@@ -21,13 +21,18 @@ export default function AdminLayout({
   const { user, signOut, loading } = useAuth(); // Use the auth context
   const router = useRouter();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [loading, user, router]);
+
   // Handle logout
   const handleSignOut = async () => {
     await signOut();
     // signOut in AuthProvider already redirects to /login
   };
 
-  // While loading auth state, you might want to show a loader or nothing
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -36,13 +41,13 @@ export default function AdminLayout({
     );
   }
 
-  // If not authenticated, redirect to login (though page.tsx might also do this)
-  // This provides an additional layer of protection for the layout itself
+  // If user is null even after loading (e.g., during redirection by useEffect), show a message
   if (!user) {
-    if (typeof window !== 'undefined') { // Ensure router.push is client-side
-      router.push('/login');
-    }
-    return null; // Or a loading/redirecting message
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-xl">Redirecting to login...</p>
+      </div>
+    );
   }
   
   // Check if the authenticated user is the allowed admin
@@ -56,7 +61,6 @@ export default function AdminLayout({
       </div>
     );
   }
-
 
   return (
     <div className="flex flex-col min-h-screen">

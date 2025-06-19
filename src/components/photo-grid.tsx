@@ -27,8 +27,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter, // Added DialogFooter
-  DialogClose, // Added DialogClose
+  DialogFooter, 
+  DialogClose, 
 } from "@/components/ui/dialog";
 
 interface PhotoGridProps {
@@ -65,9 +65,9 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                     <Image
                       src={photo.src}
                       alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
-                      layout="fill"
-                      objectFit="cover"
-                      className="transition-transform duration-500 ease-in-out group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="transition-transform duration-500 ease-in-out group-hover:scale-110 object-cover"
                       data-ai-hint="photo album"
                     />
                   </div>
@@ -127,11 +127,12 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
               <Image
                 src={photo.src}
                 alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
-                layout="fill"
-                objectFit="contain" // Use contain to ensure whole image is visible
+                fill
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="object-contain"
               />
             </div>
-            <DialogFooter className="mt-auto sm:justify-between items-center"> {/* Ensure footer items are spaced */}
+            <DialogFooter className="mt-auto sm:justify-between items-center"> 
               <div className="flex items-center text-sm text-muted-foreground">
                   <CategoryIcon category={photo.category} className="mr-2 h-4 w-4 text-primary" />
                   <span className="font-body">{photo.category}</span>

@@ -6,8 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Photo } from "@/types";
 import { motion } from "framer-motion";
 import { CategoryIcon } from "./icons/category-icon";
-// Dialog components won't be used here directly, but PhotoGrid will handle individual photo views.
-// If you want highlights to also open in a modal, this component would need similar Dialog logic as PhotoGrid.
 
 interface WeeklyHighlightsProps {
   photos: Photo[];
@@ -46,9 +44,9 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
               <Image
                 src={photo.src}
                 alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
-                layout="fill"
-                objectFit="cover"
-                className="transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="transition-transform duration-500 group-hover:scale-110 object-cover"
                 data-ai-hint="highlight event"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -63,9 +61,6 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
                   <span className="font-body">{photo.category}</span>
                 </div>
               </div>
-              {/* If these highlights should also be clickable to open a modal,
-                  you'd wrap this Card in a DialogTrigger and add DialogContent,
-                  similar to how it's done in PhotoGrid. For now, it remains a static display. */}
             </CardContent>
           </Card>
         </motion.div>

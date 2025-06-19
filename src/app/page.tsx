@@ -46,11 +46,11 @@ export default function PublicHomePage() {
           console.log("No site settings document found, using defaults.");
           setSiteSettings({ heroBackdropUrl: DEFAULT_HERO_IMAGE, profilePhotoUrl: DEFAULT_PROFILE_IMAGE });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching site settings:", error);
         toast({
           title: "Error loading site visuals",
-          description: "Could not load some site visual elements. Defaulting to placeholders.",
+          description: `Could not load some site visual elements. Defaulting to placeholders. Error: ${error.message}`,
           variant: "destructive"
         });
         setSiteSettings({ heroBackdropUrl: DEFAULT_HERO_IMAGE, profilePhotoUrl: DEFAULT_PROFILE_IMAGE });
@@ -115,15 +115,15 @@ export default function PublicHomePage() {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { staggerChildren: 0.2, delayChildren: 0.1, duration: 0.5, ease: "easeOut" }
+      transition: { staggerChildren: 0.15, delayChildren: 0.1, duration: 0.5, ease: "easeOut" }
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 0, y: 30 },
     visible: { 
       opacity: 1, y: 0,
-      transition: { type: "spring", stiffness: 100, damping: 12 }
+      transition: { type: "spring", stiffness: 90, damping: 15 }
     },
   };
 
@@ -175,11 +175,11 @@ export default function PublicHomePage() {
             <Image
               src={currentHeroImageUrl}
               alt="Hero backdrop for Amrit's Photo Stack"
-              layout="fill"
-              objectFit="cover"
-              data-ai-hint="abstract dark texture"
+              fill
+              sizes="100vw"
               priority
-              className="pointer-events-none"
+              className="pointer-events-none object-cover"
+              data-ai-hint="abstract dark texture"
             />
           )}
         </div>
