@@ -6,6 +6,8 @@ import type { Photo } from '@/types';
 
 const PRODUCTION_URL = 'https://pics.amritkumarchanchal.me';
 
+export const revalidate = 86400; // Revalidate a maximum of once per day (86400 seconds)
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticRoutes = ['', '/admin', '/contact'].map((route) => ({
