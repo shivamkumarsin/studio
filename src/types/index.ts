@@ -1,8 +1,12 @@
+
+import type { Timestamp } from 'firebase/firestore';
+
 export interface Photo {
-  id: string;
-  src: string;
+  id: string; // Firestore document ID
+  src: string; // Firebase Storage URL
   name: string;
   category: string;
+  createdAt?: Timestamp; // For ordering
 }
 
 export const APP_CATEGORIES = [

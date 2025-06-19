@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,24 +8,44 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Camera } from "lucide-react";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
+
 
 export default function PublicHomePage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<Category | typeof ALL_CATEGORIES_OPTION>(ALL_CATEGORIES_OPTION);
-  const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsClient(true);
-    const storedPhotos = localStorage.getItem("userPhotos");
-    if (storedPhotos) {
-      try {
-        setPhotos(JSON.parse(storedPhotos));
-      } catch (error) {
-        console.error("Error parsing photos from localStorage", error);
-        localStorage.removeItem("userPhotos"); 
-      }
-    }
-  }, []);
+    setCurrentTime(new Date().toLocaleTimeString());
+
+    setIsLoading(true);
+    const photosCollection = collection(db, "photos");
+    const q = query(photosCollection, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const photosData: Photo[] = [];
+      querySnapshot.forEach((doc) => {
+        photosData.push({ id: doc.id, ...doc.data() } as Photo);
+      });
+      setPhotos(photosData);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching photos from Firestore:", error);
+      toast({
+        title: "Error",
+        description: "Could not fetch photos. Please try again later.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    });
+    
+    return () => unsubscribe(); // Cleanup listener on component unmount
+  }, [toast]);
 
   const filteredPhotos =
     selectedCategory === ALL_CATEGORIES_OPTION
@@ -48,17 +69,20 @@ export default function PublicHomePage() {
           onSelectCategory={setSelectedCategory}
         />
         <Separator className="my-6" />
-        {isClient ? (
-           <PhotoGrid photos={filteredPhotos} />
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-xl font-body text-muted-foreground">Loading photos...</p>
+        {isLoading ? (
+           <div className="text-center py-10">
+            <p className="text-xl font-body text-muted-foreground">Loading photos from Firebase...</p>
           </div>
+        ) : (
+           <PhotoGrid photos={filteredPhotos} />
         )}
       </main>
 
       <footer className="bg-secondary text-secondary-foreground py-4 text-center mt-auto">
-        <p className="font-body text-sm">&copy; {new Date().getFullYear()} Amrit's Photo Stack. All rights reserved.</p>
+        <p className="font-body text-sm">
+          &copy; {currentTime ? new Date().getFullYear() : '...'} Amrit's Photo Stack. All rights reserved.
+          {currentTime && ` Current time: ${currentTime}`}
+        </p>
       </footer>
     </div>
   );
