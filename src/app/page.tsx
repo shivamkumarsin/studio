@@ -11,7 +11,7 @@ import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, Star, ChevronDown } from "lucide-react";
+import { Camera, Mail, Star, ChevronDown, UserCircle } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -108,9 +108,12 @@ export default function PublicHomePage() {
             <Camera className="h-7 w-7 md:h-8 md:w-8 text-primary" />
             Amrit K. Chanchal
           </Link>
-          <nav className="flex items-center gap-3 md:gap-5">
+          <nav className="flex items-center gap-1 md:gap-3">
             <Button variant="ghost" onClick={() => scrollToSection('weekly-highlights-section')} className="text-sm md:text-base hover:text-primary">
               Highlights
+            </Button>
+            <Button variant="ghost" onClick={() => scrollToSection('about-me-section')} className="text-sm md:text-base hover:text-primary">
+              About
             </Button>
             <Button variant="ghost" onClick={() => scrollToSection('category-filter-section')} className="text-sm md:text-base hover:text-primary">
               Gallery
@@ -159,7 +162,7 @@ export default function PublicHomePage() {
             variants={itemVariants}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Exploring the world through my lens. Welcome to my personal collection of aesthetic moments, captured and shared.
+            Exploring the world through my lens. Welcome to my personal collection of aesthetic moments, captured and shared for Google Images and beyond.
           </motion.p>
           <motion.div variants={itemVariants}>
             <Button
@@ -194,6 +197,50 @@ export default function PublicHomePage() {
           )}
         </div>
       </section>
+
+      <section id="about-me-section" className="py-16 md:py-24 bg-background scroll-mt-20">
+        <div className="container mx-auto px-4">
+          <motion.h2 
+            variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
+            className="text-3xl md:text-4xl font-headline font-bold text-center text-primary mb-12 flex items-center justify-center gap-3"
+          >
+            <UserCircle className="h-8 w-8" />
+            Behind the Lens
+          </motion.h2>
+          <motion.div 
+            variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
+            className="flex flex-col md:flex-row items-center gap-8 md:gap-12"
+          >
+            <div className="md:w-1/3 flex-shrink-0">
+              <Image 
+                src="https://placehold.co/400x400.png" 
+                alt="Amrit Kumar Chanchal"
+                width={400}
+                height={400}
+                className="rounded-lg shadow-xl mx-auto"
+                data-ai-hint="photographer portrait"
+              />
+            </div>
+            <div className="md:w-2/3 text-center md:text-left">
+              <h3 className="text-2xl font-headline text-foreground mb-4">Amrit Kumar Chanchal</h3>
+              <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
+                Hello! I'm Amrit, a passionate photographer driven by the desire to capture the beauty and emotion in everyday moments. From vibrant landscapes to intimate portraits, my goal is to tell stories through my lens. 
+              </p>
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                This website is my personal canvas, a place where I share my aesthetic vision with the world. I believe every picture holds a unique narrative, and I'm thrilled to share mine with you. My focus is on creating images that resonate and are discoverable, hoping they bring a bit of inspiration or joy.
+              </p>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => scrollToSection('category-filter-section')}
+                className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground"
+              >
+                View My Work
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
       
       <main id="gallery-main-section" className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div id="category-filter-section" className="scroll-mt-24">
@@ -226,16 +273,17 @@ export default function PublicHomePage() {
           <div className="flex flex-col items-center mb-4">
             <Link href="/" className="text-xl font-headline flex items-center gap-2 hover:opacity-80 transition-opacity mb-2">
               <Camera className="h-6 w-6 text-primary" />
-              Amrit Kumar Chanchal Photography
+              Amrit's Photo Stack
             </Link>
             <p className="text-xs text-muted-foreground max-w-sm">
-              Sharing life&apos;s aesthetic moments, one snapshot at a time. All photos by Amrit Kumar Chanchal.
+              Capturing life's aesthetic moments, one snapshot at a time. All photos by Amrit Kumar Chanchal.
             </p>
           </div>
           
-          <nav className="flex justify-center items-center gap-x-4 sm:gap-x-5 mb-4 text-sm">
+          <nav className="flex justify-center items-center gap-x-4 sm:gap-x-5 mb-4 text-sm flex-wrap">
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>Home</Button>
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>Highlights</Button>
+            <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('about-me-section')}>About</Button>
             <Button variant="link" className="text-secondary-foreground hover:text-primary p-0" onClick={() => scrollToSection('gallery-main-section')}>Gallery</Button>
             <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
             <Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
@@ -250,3 +298,4 @@ export default function PublicHomePage() {
     </div>
   );
 }
+
