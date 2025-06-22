@@ -68,33 +68,83 @@ export default function AdminPage() {
 
   const handlePhotoDelete = async (photoId: string) => {
     if (user?.email !== ADMIN_EMAIL) {
-      toast({ title: "Unauthorized", description: "You cannot delete photos.", variant: "destructive" });
+      toast({ 
+        title: "Unauthorized", 
+        description: "You cannot delete photos.", 
+        variant: "destructive" 
+      });
       return;
     }
+
     const photoToDelete = photos.find(p => p.id === photoId);
     if (!photoToDelete) {
-      toast({ title: "Error", description: "Photo not found.", variant: "destructive" });
+      toast({ 
+        title: "Error", 
+        description: "Photo not found.", 
+        variant: "destructive" 
+      });
       return;
     }
 
     try {
-      await deleteDoc(doc(db, "photos", photoId));
+      console.log(`Attempting to delete photo: ${photoId}`);
       
+      // First, delete from Firestore
+      await deleteDoc(doc(db, "photos", photoId));
+      console.log(`Successfully deleted photo from Firestore: ${photoId}`);
+      
+      // Then, delete from Firebase Storage if it's a Firebase Storage URL
       if (photoToDelete.src && photoToDelete.src.includes("firebasestorage.googleapis.com")) {
-        const storage = getStorage();
-        const photoRef = ref(storage, photoToDelete.src);
-        await deleteObject(photoRef);
+        try {
+          const storage = getStorage();
+          
+          // Extract the file path from the Firebase Storage URL
+          const url = new URL(photoToDelete.src);
+          const pathMatch = url.pathname.match(/\/o\/(.+)\?/);
+          
+          if (pathMatch) {
+            const filePath = decodeURIComponent(pathMatch[1]);
+            console.log(`Attempting to delete file from storage: ${filePath}`);
+            
+            const photoRef = ref(storage, filePath);
+            await deleteObject(photoRef);
+            console.log(`Successfully deleted file from storage: ${filePath}`);
+          } else {
+            console.warn("Could not extract file path from URL:", photoToDelete.src);
+          }
+        } catch (storageError) {
+          console.error("Error deleting from storage (but Firestore deletion succeeded):", storageError);
+          // Don't fail the entire operation if storage deletion fails
+        }
       }
       
       toast({
-        title: "Photo Deleted",
-        description: `"${photoToDelete.name}" has been removed.`,
+        title: "Photo Deleted Successfully",
+        description: `"${photoToDelete.name}" has been removed from your collection.`,
       });
+
+      // Update local state to remove the deleted photo immediately
+      setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== photoId));
+      
     } catch (error) {
       console.error("Error deleting photo:", error);
+      
+      // Provide more specific error messages
+      let errorMessage = "Could not delete the photo. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("permission")) {
+          errorMessage = "Permission denied. Check your admin privileges.";
+        } else if (error.message.includes("not-found")) {
+          errorMessage = "Photo not found in database.";
+        } else if (error.message.includes("network")) {
+          errorMessage = "Network error. Check your internet connection.";
+        }
+      }
+      
       toast({
         title: "Error Deleting Photo",
-        description: "Could not remove the photo. Please try again. Check console for details.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
