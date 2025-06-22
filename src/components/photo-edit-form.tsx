@@ -35,6 +35,96 @@ function stripHtml(html: string): string {
   return tmp.textContent || tmp.innerText || "";
 }
 
+// Helper function to safely format date for input
+function formatDateForInput(date: Date | any): string {
+  if (!date) {
+    return new Date().toISOString().split('T')[0];
+  }
+  
+  try {
+    let photoDate: Date;
+    
+    // Handle Firestore Timestamp
+    if (date.toDate && typeof date.toDate === 'function') {
+      photoDate = date.toDate();
+    }
+    // Handle Firestore Timestamp with seconds property
+    else if (date.seconds && typeof date.seconds === 'number') {
+      photoDate = new Date(date.seconds * 1000);
+    }
+    // Handle regular Date object
+    else if (date instanceof Date) {
+      photoDate = date;
+    }
+    // Handle date string
+    else if (typeof date === 'string') {
+      photoDate = new Date(date);
+    }
+    // Handle timestamp number
+    else if (typeof date === 'number') {
+      photoDate = new Date(date);
+    }
+    else {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    // Check if date is valid
+    if (isNaN(photoDate.getTime())) {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    return photoDate.toISOString().split('T')[0];
+  } catch (error) {
+    console.error('Error formatting date for input:', error);
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+// Helper function to safely format time for input
+function formatTimeForInput(date: Date | any): string {
+  if (!date) {
+    return new Date().toTimeString().slice(0, 5);
+  }
+  
+  try {
+    let photoDate: Date;
+    
+    // Handle Firestore Timestamp
+    if (date.toDate && typeof date.toDate === 'function') {
+      photoDate = date.toDate();
+    }
+    // Handle Firestore Timestamp with seconds property
+    else if (date.seconds && typeof date.seconds === 'number') {
+      photoDate = new Date(date.seconds * 1000);
+    }
+    // Handle regular Date object
+    else if (date instanceof Date) {
+      photoDate = date;
+    }
+    // Handle date string
+    else if (typeof date === 'string') {
+      photoDate = new Date(date);
+    }
+    // Handle timestamp number
+    else if (typeof date === 'number') {
+      photoDate = new Date(date);
+    }
+    else {
+      return new Date().toTimeString().slice(0, 5);
+    }
+
+    // Check if date is valid
+    if (isNaN(photoDate.getTime())) {
+      return new Date().toTimeString().slice(0, 5);
+    }
+
+    return photoDate.toTimeString().slice(0, 5);
+  } catch (error) {
+    console.error('Error formatting time for input:', error);
+    return new Date().toTimeString().slice(0, 5);
+  }
+}
+
 export function PhotoEditForm({ photo, onSave, onCancel }: PhotoEditFormProps) {
   // Form fields initialized with existing photo data
   const [title, setTitle] = useState(photo.name || "");
@@ -45,18 +135,10 @@ export function PhotoEditForm({ photo, onSave, onCancel }: PhotoEditFormProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category>(photo.category as Category);
   const [tags, setTags] = useState(photo.tags ? photo.tags.join(", ") : "");
   const [postingDate, setPostingDate] = useState(() => {
-    if (photo.postingDate) {
-      const date = photo.postingDate instanceof Date ? photo.postingDate : new Date(photo.postingDate);
-      return date.toISOString().split('T')[0];
-    }
-    return new Date().toISOString().split('T')[0];
+    return formatDateForInput(photo.postingDate);
   });
   const [postingTime, setPostingTime] = useState(() => {
-    if (photo.postingDate) {
-      const date = photo.postingDate instanceof Date ? photo.postingDate : new Date(photo.postingDate);
-      return date.toTimeString().slice(0, 5);
-    }
-    return new Date().toTimeString().slice(0, 5);
+    return formatTimeForInput(photo.postingDate);
   });
   
   const [isUpdating, setIsUpdating] = useState(false);
@@ -79,19 +161,50 @@ export function PhotoEditForm({ photo, onSave, onCancel }: PhotoEditFormProps) {
 
     try {
       const plainTextDescription = stripHtml(description);
-      const postingDateTime = new Date(`${postingDate}T${postingTime}`);
+      
+      // Create posting date from date and time inputs with proper validation
+      let postingDateTime: Date;
+      try {
+        const dateTimeString = `${postingDate}T${postingTime}`;
+        postingDateTime = new Date(dateTimeString);
+        
+        // Check if the date is valid
+        if (isNaN(postingDateTime.getTime())) {
+          throw new Error("Invalid date");
+        }
+      } catch (error) {
+        console.error("Invalid date/time provided, using current time:", error);
+        postingDateTime = new Date(); // Fallback to current time
+      }
 
-      const updatedData = {
+      // Prepare update data with proper field handling
+      const updatedData: any = {
         name: title.trim(),
         category: selectedCategory,
         description: plainTextDescription,
         altText: altText.trim(),
-        caption: caption.trim() || undefined,
-        location: location.trim() || undefined,
-        tags: tags.trim() ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : undefined,
         postingDate: postingDateTime,
         updatedAt: serverTimestamp(),
       };
+
+      // Only add optional fields if they have values
+      if (caption.trim()) {
+        updatedData.caption = caption.trim();
+      } else {
+        updatedData.caption = null; // Explicitly set to null to remove field
+      }
+      
+      if (location.trim()) {
+        updatedData.location = location.trim();
+      } else {
+        updatedData.location = null; // Explicitly set to null to remove field
+      }
+      
+      if (tags.trim()) {
+        updatedData.tags = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+      } else {
+        updatedData.tags = null; // Explicitly set to null to remove field
+      }
 
       await updateDoc(doc(db, "photos", photo.id), updatedData);
 
@@ -112,7 +225,7 @@ export function PhotoEditForm({ photo, onSave, onCancel }: PhotoEditFormProps) {
       console.error("Error updating photo:", error);
       toast({
         title: "Update Failed",
-        description: "Could not update the post. Please try again.",
+        description: "Could not update the post. Please try again. Check console for details.",
         variant: "destructive",
       });
     } finally {

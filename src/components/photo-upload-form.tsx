@@ -33,7 +33,7 @@ function stripHtml(html: string): string {
 
 // Helper function to generate suggested filename
 function generateSuggestedFilename(originalName: string, title: string, location: string): string {
-  const authorName = "amrit-kumar-chanchal"; // Updated to use full name
+  const authorName = "amrit-kumar-chanchal";
   const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   const cleanLocation = location.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   const extension = originalName.split('.').pop() || 'jpg';
@@ -57,8 +57,11 @@ export function PhotoUploadForm({ onUploadSuccess }: PhotoUploadFormProps) {
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | "">(APP_CATEGORIES[0]);
   const [tags, setTags] = useState("");
-  const [postingDate, setPostingDate] = useState(new Date().toISOString().split('T')[0]);
-  const [postingTime, setPostingTime] = useState(new Date().toTimeString().slice(0, 5));
+  
+  // Initialize with current date and time
+  const now = new Date();
+  const [postingDate, setPostingDate] = useState(now.toISOString().split('T')[0]);
+  const [postingTime, setPostingTime] = useState(now.toTimeString().slice(0, 5));
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -111,8 +114,12 @@ export function PhotoUploadForm({ onUploadSuccess }: PhotoUploadFormProps) {
     setDescription("");
     setSelectedCategory(APP_CATEGORIES[0]);
     setTags("");
-    setPostingDate(new Date().toISOString().split('T')[0]);
-    setPostingTime(new Date().toTimeString().slice(0, 5));
+    
+    // Reset to current date and time
+    const now = new Date();
+    setPostingDate(now.toISOString().split('T')[0]);
+    setPostingTime(now.toTimeString().slice(0, 5));
+    
     setIsUploading(false);
     setUploadProgress(0);
     setCurrentTaskMessage(null);
@@ -142,8 +149,20 @@ export function PhotoUploadForm({ onUploadSuccess }: PhotoUploadFormProps) {
     const plainTextDescription = stripHtml(description);
     const photoTitleForDB = title.trim();
 
-    // Create posting date from date and time inputs
-    const postingDateTime = new Date(`${postingDate}T${postingTime}`);
+    // Create posting date from date and time inputs with proper validation
+    let postingDateTime: Date;
+    try {
+      const dateTimeString = `${postingDate}T${postingTime}`;
+      postingDateTime = new Date(dateTimeString);
+      
+      // Check if the date is valid
+      if (isNaN(postingDateTime.getTime())) {
+        throw new Error("Invalid date");
+      }
+    } catch (error) {
+      console.error("Invalid date/time provided, using current time:", error);
+      postingDateTime = new Date(); // Fallback to current time
+    }
 
     for (let i = 0; i < totalFiles; i++) {
       const file = selectedFiles[i];
@@ -178,25 +197,29 @@ export function PhotoUploadForm({ onUploadSuccess }: PhotoUploadFormProps) {
               try {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                 
-                const photoData: Omit<Photo, "id" | "createdAt"> & { 
-                  createdAt: any;
-                  altText: string;
-                  caption?: string;
-                  location?: string;
-                  tags?: string[];
-                  postingDate: Date;
-                } = {
+                // Prepare photo data with proper field handling
+                const photoData: any = {
                   src: downloadURL,
                   name: photoTitleForDB,
                   category: selectedCategory,
                   description: plainTextDescription,
                   altText: altText.trim(),
-                  caption: caption.trim() || undefined,
-                  location: location.trim() || undefined,
-                  tags: tags.trim() ? tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : undefined,
                   postingDate: postingDateTime,
                   createdAt: serverTimestamp(),
                 };
+
+                // Only add optional fields if they have values
+                if (caption.trim()) {
+                  photoData.caption = caption.trim();
+                }
+                
+                if (location.trim()) {
+                  photoData.location = location.trim();
+                }
+                
+                if (tags.trim()) {
+                  photoData.tags = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+                }
 
                 await addDoc(collection(db, "photos"), photoData);
                 toast({
