@@ -20,7 +20,11 @@ import {
   Menu,
   Grid3X3,
   ArrowRight,
-  Album
+  Album,
+  GraduationCap,
+  Briefcase,
+  BarChart3,
+  Palette
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
@@ -234,8 +238,8 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div variants={itemVariants} className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
-              <Album className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Welcome to My Visual Journey</span>
+              <GraduationCap className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">Undergraduate at IIT Madras | Freelancer | Ads Account Manager | Multi Media | Data Science</span>
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
           </motion.div>
@@ -254,7 +258,7 @@ export default function PublicHomePage() {
               <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent flex-1 max-w-20"></div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-muted-foreground mb-6">
-              Visual Artist & Storyteller
+              IIT Madras Student | Visual Artist & Digital Marketing Expert
             </h2>
             <div className="max-w-4xl mx-auto space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
@@ -382,7 +386,7 @@ export default function PublicHomePage() {
               <span className="text-sm text-muted-foreground">About the Artist</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-              My Creative Journey
+              My Professional Journey
             </h2>
           </motion.div>
 
@@ -398,14 +402,14 @@ export default function PublicHomePage() {
               <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow card-modern">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
-                  alt="Amrit Kumar Chanchal - Visual Artist & Photographer"
+                  alt="Amrit Kumar Chanchal - IIT Madras Student & Visual Artist"
                   width={400}
                   height={400}
                   className="rounded-2xl mx-auto object-cover aspect-square shadow-2xl"
                   sizes="(max-width: 768px) 80vw, 400px"
                 />
                 <div className="absolute -bottom-4 -right-4 bg-primary text-black p-3 rounded-full shadow-lg blue-glow">
-                  <Album className="h-6 w-6" />
+                  <GraduationCap className="h-6 w-6" />
                 </div>
               </div>
             </div>
@@ -413,31 +417,52 @@ export default function PublicHomePage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-3xl font-bold text-foreground mb-2">Amrit Kumar Chanchal</h3>
-                <p className="text-primary font-semibold">Visual Artist & Creative Storyteller</p>
+                <p className="text-primary font-semibold mb-2">Undergraduate at IIT Madras | Freelancer | Ads Account Manager | Multi Media | Data Science</p>
+                <div className="flex items-center gap-2 text-sm text-accent">
+                  <GraduationCap className="h-4 w-4" />
+                  <span>Indian Institute of Technology, Madras</span>
+                </div>
               </div>
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Welcome to my personal album. I'm Amrit, a passionate visual artist who believes 
-                  in the power of photography to capture life's most precious moments and tell compelling stories.
+                  I am an undergraduate student at the prestigious Indian Institute of Technology (IIT) Madras, 
+                  combining academic excellence with professional experience. As a versatile freelancer and 
+                  Ads Account Manager, I help businesses optimize their digital presence and marketing campaigns.
                 </p>
                 <p>
-                  Through my lens, I explore the beauty in everyday moments, the emotions in human connections, 
-                  and the artistry in natural landscapes. Each photograph in this collection represents a piece 
-                  of my journey and a story waiting to be discovered.
+                  My expertise spans multimedia content creation and data science, where I leverage analytical 
+                  skills to drive results. Currently pursuing my degree program, I bring a unique blend of 
+                  technical knowledge and practical business acumen to every project.
                 </p>
                 <p>
-                  This album showcases my favorite captures - from spontaneous street photography to carefully 
-                  composed portraits. I hope these images inspire you and perhaps remind you of your own 
-                  beautiful moments worth preserving.
+                  Through my lens, I explore the intersection of technology and creativity, capturing moments 
+                  that tell compelling stories. This album showcases my passion for visual storytelling 
+                  alongside my professional journey in the digital landscape.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Portrait Photography</span>
-                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Street Photography</span>
-                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Nature & Landscapes</span>
-                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Creative Projects</span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30 flex items-center gap-1">
+                  <GraduationCap className="h-3 w-3" />
+                  IIT Madras
+                </span>
+                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30 flex items-center gap-1">
+                  <Briefcase className="h-3 w-3" />
+                  Freelancer
+                </span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30 flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3" />
+                  Ads Manager
+                </span>
+                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30 flex items-center gap-1">
+                  <Palette className="h-3 w-3" />
+                  Multi Media
+                </span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30 flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3" />
+                  Data Science
+                </span>
               </div>
 
               <div className="flex gap-4 pt-4">
