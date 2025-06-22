@@ -33,7 +33,7 @@ function stripHtml(html: string): string {
 
 // Helper function to generate suggested filename
 function generateSuggestedFilename(originalName: string, title: string, location: string): string {
-  const authorName = "amrit-kumar";
+  const authorName = "amrit-kumar-chanchal"; // Updated to use full name
   const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   const cleanLocation = location.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   const extension = originalName.split('.').pop() || 'jpg';
@@ -491,10 +491,10 @@ export function PhotoUploadForm() {
           <div className="p-4 bg-primary/10 rounded-lg">
             <h4 className="font-semibold text-primary mb-2">File Naming Convention</h4>
             <p className="text-sm text-muted-foreground mb-2">
-              All images will be renamed using the format: <code className="bg-muted px-1 rounded">amrit-kumar-[location]-[title].jpg</code>
+              All images will be renamed using the format: <code className="bg-muted px-1 rounded">amrit-kumar-chanchal-[location]-[title].jpg</code>
             </p>
             <p className="text-xs text-muted-foreground">
-              Example: amrit-kumar-bhagalpur-sunset.jpg
+              Example: amrit-kumar-chanchal-bhagalpur-sunset.jpg
             </p>
           </div>
 
