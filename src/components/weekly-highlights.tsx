@@ -28,6 +28,13 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
     );
   }
 
+  // Sort photos by date (latest first) to ensure proper ordering
+  const sortedPhotos = [...photos].sort((a, b) => {
+    const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+    const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+    return dateB.getTime() - dateA.getTime(); // Descending order (latest first)
+  });
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -54,7 +61,7 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
       viewport={{ once: true, amount: 0.2 }}
       className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10"
     >
-      {photos.map((photo, index) => (
+      {sortedPhotos.map((photo, index) => (
         <motion.div 
           key={photo.id} 
           variants={itemVariants}
@@ -74,6 +81,16 @@ export function WeeklyHighlights({ photos }: WeeklyHighlightsProps) {
                     <span>Featured</span>
                   </div>
                 </div>
+
+                {/* Latest badge for first item */}
+                {index === 0 && (
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="flex items-center gap-1 px-3 py-1 bg-primary/90 text-primary-foreground rounded-full text-xs font-bold backdrop-blur-sm shadow-lg">
+                      <Star className="h-3 w-3 animate-pulse" />
+                      <span>Latest</span>
+                    </div>
+                  </div>
+                )}
 
                 <CardHeader className="p-0 relative aspect-[4/3] w-full overflow-hidden">
                   <Image

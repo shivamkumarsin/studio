@@ -42,6 +42,7 @@ export default function AdminPage() {
     if (user && user.email === ADMIN_EMAIL) {
       setIsLoadingPhotos(true);
       const photosCollection = collection(db, "photos");
+      // FIXED: Ensure photos are ordered by latest first (descending order)
       const q = query(photosCollection, orderBy("createdAt", "desc"));
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -365,8 +366,8 @@ export default function AdminPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">
                 {selectedCategory === ALL_CATEGORIES_OPTION 
-                  ? `All Photos (${filteredPhotos.length})` 
-                  : `${selectedCategory} (${filteredPhotos.length})`
+                  ? `All Photos (${filteredPhotos.length}) - Latest First` 
+                  : `${selectedCategory} (${filteredPhotos.length}) - Latest First`
                 }
               </h2>
               <div className="flex items-center gap-2">
