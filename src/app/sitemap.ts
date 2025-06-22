@@ -42,15 +42,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
   
-  // Dynamic photo pages - LIMIT the number of photos to reduce bandwidth
+  // Dynamic photo pages - LIMIT to only 20 most recent photos
   let photoRoutes: MetadataRoute.Sitemap = [];
   try {
     const photosCollection = collection(db, "photos");
-    // IMPORTANT: Limit to recent 100 photos instead of fetching ALL photos
+    // BANDWIDTH OPTIMIZATION: Only include 20 most recent photos in sitemap
     const photosQuery = query(
       photosCollection, 
       orderBy("createdAt", "desc"),
-      limit(100) // Only include recent 100 photos in sitemap
+      limit(20) // Only include recent 20 photos in sitemap
     ); 
     const photosSnapshot = await getDocs(photosQuery);
     
@@ -99,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const allRoutes = [...staticRoutes, ...photoRoutes];
-  console.log(`Generated sitemap with ${allRoutes.length} total URLs`);
+  console.log(`Generated sitemap with ${allRoutes.length} total URLs (${photoRoutes.length} photos)`);
   
   return allRoutes;
 }
