@@ -240,7 +240,7 @@ export default function PublicHomePage() {
           <motion.div variants={itemVariants} className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <GraduationCap className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Undergraduate at IIT Madras | Freelancer | Ads Account Manager | Multi Media | Data Science</span>
+              <span className="text-sm text-muted-foreground">IIT Madras | Web Developer | Freelancer | Data Science</span>
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
           </motion.div>
@@ -259,17 +259,12 @@ export default function PublicHomePage() {
               <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent flex-1 max-w-20"></div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-muted-foreground mb-6">
-              IIT Madras Student | Visual Artist & Web Developer
+              IIT Madras Student | Web Developer
             </h2>
             <div className="max-w-4xl mx-auto space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
-                Explore a curated collection of authentic moments and compelling stories captured through my lens. 
-                From intimate portraits to breathtaking landscapes, each image in this gallery represents my passion 
-                for visual storytelling and artistic expression.
-              </p>
-              <p>
-                Browse through my carefully selected works below to experience life's beautiful moments frozen in time. 
-                Whether you're seeking inspiration or looking to collaborate, I invite you to immerse yourself in these visual narratives.
+                Welcome to my visual collection. Browse through my carefully selected photos 
+                that capture life's beautiful moments and experiences.
               </p>
             </div>
           </motion.div>
@@ -350,7 +345,7 @@ export default function PublicHomePage() {
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Showcasing some of my finest photography work shared across the internet. 
-              Each image represents a unique moment and artistic vision captured through my lens.
+              Each image represents a unique moment captured through my lens.
             </p>
           </motion.div>
 
@@ -384,10 +379,10 @@ export default function PublicHomePage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <UserCircle className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">About the Artist</span>
+              <span className="text-sm text-muted-foreground">About Me</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-              My Professional Journey
+              Developer & Creator
             </h2>
           </motion.div>
 
@@ -403,14 +398,14 @@ export default function PublicHomePage() {
               <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow card-modern">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
-                  alt="Amrit Kumar Chanchal - IIT Madras Student & Visual Artist"
+                  alt="Amrit Kumar Chanchal - IIT Madras Student & Web Developer"
                   width={400}
                   height={400}
                   className="rounded-2xl mx-auto object-cover aspect-square shadow-2xl"
                   sizes="(max-width: 768px) 80vw, 400px"
                 />
                 <div className="absolute -bottom-4 -right-4 bg-primary text-black p-3 rounded-full shadow-lg blue-glow">
-                  <GraduationCap className="h-6 w-6" />
+                  <Code className="h-6 w-6" />
                 </div>
               </div>
             </div>
@@ -418,7 +413,7 @@ export default function PublicHomePage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-3xl font-bold text-foreground mb-2">Amrit Kumar Chanchal</h3>
-                <p className="text-primary font-semibold mb-2">BS in Data Science | IIT Madras | Web Developer | Freelancer</p>
+                <p className="text-primary font-semibold mb-2">BS in Data Science | IIT Madras</p>
                 <div className="flex items-center gap-2 text-sm text-accent">
                   <GraduationCap className="h-4 w-4" />
                   <span>Indian Institute of Technology, Madras</span>
@@ -427,19 +422,8 @@ export default function PublicHomePage() {
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  I am an undergraduate student at the prestigious Indian Institute of Technology (IIT) Madras, 
-                  combining academic excellence with professional experience. As a versatile freelancer and 
-                  Ads Account Manager, I help businesses optimize their digital presence and marketing campaigns.
-                </p>
-                <p>
-                  My expertise spans multimedia content creation and data science, where I leverage analytical 
-                  skills to drive results. Currently pursuing BS in Data Science, I bring a unique blend of 
-                  technical knowledge and practical business acumen to every project.
-                </p>
-                <p>
-                  Through my lens, I explore the intersection of technology and creativity, capturing moments 
-                  that tell compelling stories. This album showcases my passion for visual storytelling 
-                  alongside my professional journey in the digital landscape.
+                  Undergraduate at IIT Madras pursuing BS in Data Science. 
+                  Freelancer and Ads Account Manager with expertise in web development and multimedia content creation.
                 </p>
               </div>
 
@@ -459,14 +443,6 @@ export default function PublicHomePage() {
                 <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30 flex items-center gap-1">
                   <Briefcase className="h-3 w-3" />
                   Freelancer
-                </span>
-                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30 flex items-center gap-1">
-                  <BarChart3 className="h-3 w-3" />
-                  Ads Manager
-                </span>
-                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30 flex items-center gap-1">
-                  <Palette className="h-3 w-3" />
-                  Multi Media
                 </span>
               </div>
 
