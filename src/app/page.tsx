@@ -4,11 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { CategoryFilter } from "@/components/category-filter";
 import { PhotoGrid } from "@/components/photo-grid";
-import type { Photo, Category } from "@/types";
-import { ALL_CATEGORIES_OPTION } from "@/types";
-import { Separator } from "@/components/ui/separator";
+import type { Photo } from "@/types";
 import { Button } from "@/components/ui/button";
 import { 
   Images, 
@@ -20,7 +17,9 @@ import {
   Sparkles,
   Eye,
   Award,
-  Menu
+  Menu,
+  Grid3X3,
+  ArrowRight
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
@@ -34,7 +33,6 @@ const PROFILE_IMAGE_URL = "https://certify.amritkumarchanchal.me/amrit-kumar-cha
 export default function PublicHomePage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<Category | typeof ALL_CATEGORIES_OPTION>(ALL_CATEGORIES_OPTION);
   const [highlightPhotos, setHighlightPhotos] = useState<Photo[]>([]);
   const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
   const { toast } = useToast();
@@ -47,7 +45,7 @@ export default function PublicHomePage() {
   useEffect(() => {
     setIsLoading(true);
     const photosCollection = collection(db, "photos");
-    const q = query(photosCollection, orderBy("createdAt", "desc"));
+    const q = query(photosCollection, orderBy("createdAt", "desc"), limit(12)); // Limit to 12 for home page
 
     const unsubscribePhotos = onSnapshot(q, (querySnapshot) => {
       const photosData: Photo[] = [];
@@ -91,11 +89,6 @@ export default function PublicHomePage() {
     };
   }, [toast]);
 
-  const filteredPhotos =
-    selectedCategory === ALL_CATEGORIES_OPTION
-      ? photos
-      : photos.filter((photo) => photo.category === selectedCategory);
-
   const heroVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -128,9 +121,9 @@ export default function PublicHomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-x-hidden">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-primary rounded-full animate-pulse opacity-60"></div>
+      {/* Floating decorative elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-primary rounded-full animate-pulse opacity-60 floating-element"></div>
         <div className="absolute top-40 right-20 w-1 h-1 bg-accent rounded-full animate-ping opacity-40"></div>
         <div className="absolute bottom-40 left-1/4 w-3 h-3 bg-primary rounded-full animate-bounce opacity-30"></div>
         <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-accent rounded-full animate-pulse opacity-50"></div>
@@ -164,7 +157,7 @@ export default function PublicHomePage() {
               <Button 
                 variant="ghost" 
                 onClick={() => scrollToSection('weekly-highlights-section')} 
-                className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
+                className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover"
               >
                 <Star className="mr-2 h-4 w-4" />
                 Featured
@@ -172,21 +165,22 @@ export default function PublicHomePage() {
               <Button 
                 variant="ghost" 
                 onClick={() => scrollToSection('about-me-section')} 
-                className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
+                className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover"
               >
                 <UserCircle className="mr-2 h-4 w-4" />
                 About
               </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => scrollToSection('category-filter-section')} 
-                className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
-              >
-                <Images className="mr-2 h-4 w-4" />
-                Portfolio
-              </Button>
+              <Link href="/categories">
+                <Button 
+                  variant="ghost" 
+                  className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover"
+                >
+                  <Grid3X3 className="mr-2 h-4 w-4" />
+                  Categories
+                </Button>
+              </Link>
               <Link href="/contact">
-                <Button variant="ghost" className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300">
+                <Button variant="ghost" className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover">
                   <Mail className="mr-2 h-4 w-4" />
                   Contact
                 </Button>
@@ -194,7 +188,7 @@ export default function PublicHomePage() {
               <Link href="/admin">
                 <Button 
                   variant="outline" 
-                  className="border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 blue-glow-hover"
+                  className="border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 blue-glow-hover btn-modern"
                 >
                   Admin
                 </Button>
@@ -231,9 +225,6 @@ export default function PublicHomePage() {
             className="object-cover"
           />
         </motion.div>
-
-        {/* Professional Grid overlay */}
-        <div className="absolute inset-0 professional-grid opacity-20"></div>
 
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-background/90"></div>
@@ -273,8 +264,8 @@ export default function PublicHomePage() {
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 blue-glow animate-glow"
-              onClick={() => scrollToSection('category-filter-section')}
+              className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 blue-glow btn-modern"
+              onClick={() => scrollToSection('gallery-main-section')}
             >
               <Eye className="mr-2 h-5 w-5" />
               View Portfolio
@@ -284,7 +275,7 @@ export default function PublicHomePage() {
             <Button
               variant="outline"
               size="lg"
-              className="border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 rounded-full transition-all duration-300 blue-glow-hover"
+              className="border-primary text-primary hover:bg-primary hover:text-black px-8 py-4 rounded-full transition-all duration-300 blue-glow-hover btn-modern"
               onClick={() => scrollToSection('about-me-section')}
             >
               <UserCircle className="mr-2 h-5 w-5" />
@@ -294,15 +285,15 @@ export default function PublicHomePage() {
 
           {/* Stats */}
           <motion.div variants={itemVariants} className="mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto">
-            <div className="text-center">
+            <div className="text-center glass p-4 rounded-lg">
               <div className="text-2xl font-bold text-primary">{photos.length}+</div>
               <div className="text-sm text-muted-foreground">Projects</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-accent">6</div>
+            <div className="text-center glass p-4 rounded-lg">
+              <div className="text-2xl font-bold text-accent">30+</div>
               <div className="text-sm text-muted-foreground">Categories</div>
             </div>
-            <div className="text-center">
+            <div className="text-center glass p-4 rounded-lg">
               <div className="text-2xl font-bold text-primary">∞</div>
               <div className="text-sm text-muted-foreground">Possibilities</div>
             </div>
@@ -312,11 +303,11 @@ export default function PublicHomePage() {
         {/* Floating elements */}
         <motion.div 
           style={{ y: y2 }}
-          className="absolute top-1/4 left-10 w-20 h-20 border border-primary/30 rounded-full animate-float hidden lg:block blue-glow"
+          className="absolute top-1/4 left-10 w-20 h-20 border border-primary/30 rounded-full floating-element hidden lg:block blue-glow"
         ></motion.div>
         <motion.div 
           style={{ y: y1 }}
-          className="absolute bottom-1/4 right-10 w-16 h-16 border border-accent/30 rounded-full animate-float hidden lg:block"
+          className="absolute bottom-1/4 right-10 w-16 h-16 border border-accent/30 rounded-full floating-element hidden lg:block"
         ></motion.div>
       </motion.section>
 
@@ -364,7 +355,6 @@ export default function PublicHomePage() {
 
       {/* About Section */}
       <section id="about-me-section" className="py-20 md:py-32 relative scroll-mt-20">
-        <div className="absolute inset-0 professional-grid opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
@@ -391,7 +381,7 @@ export default function PublicHomePage() {
           >
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-3xl"></div>
-              <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow">
+              <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow card-modern">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
                   alt="Amrit Kumar Chanchal - Professional Photographer"
@@ -439,69 +429,89 @@ export default function PublicHomePage() {
               <div className="flex gap-4 pt-4">
                 <Button
                   size="lg"
-                  onClick={() => scrollToSection('category-filter-section')}
-                  className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow"
+                  onClick={() => scrollToSection('gallery-main-section')}
+                  className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow btn-modern"
                 >
                   <Eye className="mr-2 h-5 w-5" />
                   View Portfolio
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover"
-                  onClick={() => scrollToSection('weekly-highlights-section')}
-                >
-                  <Star className="mr-2 h-5 w-5" />
-                  Featured Work
-                </Button>
+                <Link href="/categories">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover btn-modern"
+                  >
+                    <Grid3X3 className="mr-2 h-5 w-5" />
+                    Browse Categories
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
       
-      {/* Portfolio Section */}
+      {/* Recent Work Section */}
       <main id="gallery-main-section" className="py-20 md:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent"></div>
         <div className="container mx-auto px-4 relative">
-          <div id="category-filter-section" className="scroll-mt-24">
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-16"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
-                <Images className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Complete Portfolio</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-                Photography Portfolio
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-                Explore my complete collection of photography work organized by category. 
-                Each section represents different aspects of my professional practice and creative vision.
-              </p>
-              
-              <CategoryFilter
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-              />
-            </motion.div>
-          </div>
-
-          <Separator className="my-12 bg-gradient-to-r from-transparent via-border to-transparent" />
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
+              <Images className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">Recent Work</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
+              Latest Photography
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              Explore my most recent photography work. Each image tells a story and showcases 
+              different aspects of my professional practice and creative vision.
+            </p>
+            
+            <Link href="/categories">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover btn-modern"
+              >
+                <Grid3X3 className="mr-2 h-5 w-5" />
+                Browse All Categories
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </motion.div>
           
           {isLoading ? (
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3">
                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xl text-muted-foreground">Loading portfolio...</p>
+                <p className="text-xl text-muted-foreground">Loading recent work...</p>
               </div>
             </div>
           ) : (
-            <PhotoGrid photos={filteredPhotos} />
+            <>
+              <PhotoGrid photos={photos} />
+              {photos.length >= 12 && (
+                <div className="text-center mt-12">
+                  <Link href="/categories">
+                    <Button 
+                      size="lg"
+                      className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow btn-modern"
+                    >
+                      <Grid3X3 className="mr-2 h-5 w-5" />
+                      View All Work
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
@@ -542,9 +552,9 @@ export default function PublicHomePage() {
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('about-me-section')}>
               About
             </Button>
-            <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('gallery-main-section')}>
-              Portfolio
-            </Button>
+            <Link href="/categories" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              Categories
+            </Link>
             <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
               Contact
             </Link>
@@ -588,7 +598,7 @@ export default function PublicHomePage() {
               </div>
             </div>
             <div className="p-6 border-t border-border/50 flex justify-end">
-              <Button variant="outline" onClick={closePhotoModal} className="border-primary text-primary hover:bg-primary hover:text-black blue-glow-hover">
+              <Button variant="outline" onClick={closePhotoModal} className="border-primary text-primary hover:bg-primary hover:text-black blue-glow-hover btn-modern">
                 Close
               </Button>
             </div>

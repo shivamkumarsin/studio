@@ -10,7 +10,7 @@ body {
 
 @layer base {
   :root {
-    /* Professional Black & Blue Theme with Pure White Text */
+    /* Modern Dark Theme with Blue Accents */
     --background: 0 0 0; /* Pure black */
     --foreground: 255 255 255; /* Pure white text */
 
@@ -99,11 +99,25 @@ body {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
     color: #ffffff !important; /* Force pure white text */
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Animated Background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
     background: 
-      /* Animated gradient backdrop */
+      /* Base gradient */
       linear-gradient(135deg, 
         rgba(0, 0, 0, 1) 0%, 
         rgba(15, 15, 30, 1) 25%, 
@@ -111,31 +125,40 @@ body {
         rgba(20, 20, 40, 1) 75%, 
         rgba(0, 0, 0, 1) 100%
       ),
-      /* Floating orbs */
+      /* Animated color layers */
       radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
       radial-gradient(circle at 40% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 70% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
-      /* Subtle grid pattern */
-      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+      radial-gradient(circle at 70% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
+    
     background-size: 
       100% 100%,
       800px 800px,
       600px 600px,
       400px 400px,
-      500px 500px,
-      100px 100px,
-      100px 100px;
+      500px 500px;
+    
     background-position:
       0 0,
       0 0,
       100% 100%,
       50% 50%,
-      80% 20%,
-      0 0,
-      0 0;
-    animation: backgroundShift 20s ease-in-out infinite;
+      80% 20%;
+    
+    animation: backgroundFlow 30s ease-in-out infinite;
+  }
+
+  /* Subtle overlay for better text readability */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(0.5px);
   }
 
   /* Force white text on all elements */
@@ -207,119 +230,73 @@ body {
   }
 }
 
-/* Background animation */
-@keyframes backgroundShift {
+/* Background animation keyframes */
+@keyframes backgroundFlow {
   0%, 100% { 
     background-position:
       0 0,
       0 0,
       100% 100%,
       50% 50%,
-      80% 20%,
+      80% 20%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% { 
+    background-position:
       0 0,
-      0 0;
+      -50px -50px,
+      110% 90%,
+      60% 40%,
+      70% 30%;
+    filter: hue-rotate(15deg) brightness(1.1);
   }
   50% { 
     background-position:
       0 0,
       -100px -100px,
       120% 80%,
-      60% 40%,
       70% 30%,
-      -10px -10px,
-      -10px -10px;
+      60% 40%;
+    filter: hue-rotate(30deg) brightness(1.2);
+  }
+  75% { 
+    background-position:
+      0 0,
+      -75px -75px,
+      115% 85%,
+      55% 45%,
+      75% 25%;
+    filter: hue-rotate(15deg) brightness(1.1);
   }
 }
 
-/* Custom animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(2deg); }
-}
-
-@keyframes glow {
-  0%, 100% { 
-    box-shadow: 
-      0 0 20px rgba(59, 130, 246, 0.4),
-      0 0 40px rgba(59, 130, 246, 0.2),
-      inset 0 0 20px rgba(59, 130, 246, 0.1);
-  }
-  50% { 
-    box-shadow: 
-      0 0 30px rgba(59, 130, 246, 0.6),
-      0 0 60px rgba(59, 130, 246, 0.3),
-      inset 0 0 30px rgba(59, 130, 246, 0.15);
-  }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
-}
-
-.animate-float {
-  animation: float 8s ease-in-out infinite;
-}
-
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(59, 130, 246, 0.3),
-    transparent
-  );
-  background-size: 200% 100%;
-  animation: shimmer 3s infinite;
-}
-
-/* Enhanced glass morphism effect - ensure dark background */
+/* Enhanced glass morphism effect */
 .glass {
-  background: rgba(0, 0, 0, 0.7) !important; /* Dark background */
+  background: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(59, 130, 246, 0.2);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: #ffffff !important; /* Ensure white text */
+  color: #ffffff !important;
+  transition: all 0.3s ease;
 }
 
-/* Professional grid pattern */
-.professional-grid {
-  background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 2px, transparent 2px);
-  background-size: 60px 60px, 60px 60px, 120px 120px;
-  animation: gridMove 30s linear infinite;
+.glass:hover {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-@keyframes gridMove {
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 60px 60px, 60px 60px, 120px 120px; }
-}
-
-/* Clean headline styles - NO EFFECTS */
-.clean-headline {
-  color: rgb(59 130 246) !important; /* Professional blue */
-  font-weight: 900; /* Extra bold */
-  letter-spacing: -0.02em; /* Tight letter spacing */
-}
-
-/* Enhanced glow effects for other elements (NOT headlines) */
+/* Enhanced glow effects */
 .blue-glow {
   box-shadow: 
     0 0 20px rgba(59, 130, 246, 0.4),
     0 0 40px rgba(59, 130, 246, 0.2),
     inset 0 0 20px rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
 }
 
 .blue-glow-hover:hover {
@@ -330,31 +307,103 @@ body {
   transform: translateY(-2px);
 }
 
-/* Floating particles */
-.floating-particles::before,
-.floating-particles::after {
+/* Smooth hover transitions */
+.smooth-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(59, 130, 246, 0.3),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Enhanced button effects */
+.btn-modern {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-modern::before {
   content: '';
   position: absolute;
-  width: 4px;
-  height: 4px;
-  background: rgba(59, 130, 246, 0.6);
-  border-radius: 50%;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-modern:hover::before {
+  left: 100%;
+}
+
+.btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* Card hover effects */
+.card-modern {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.card-modern:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  body::before {
+    background-size: 
+      100% 100%,
+      400px 400px,
+      300px 300px,
+      200px 200px,
+      250px 250px;
+  }
+}
+
+/* Clean headline styles */
+.clean-headline {
+  color: rgb(59 130 246) !important;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Floating elements */
+.floating-element {
   animation: float 6s ease-in-out infinite;
 }
 
-.floating-particles::before {
-  top: 20%;
-  left: 10%;
-  animation-delay: -2s;
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
 }
 
-.floating-particles::after {
-  top: 60%;
-  right: 15%;
-  animation-delay: -4s;
-}
-
-/* Custom scrollbar with glow */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 12px;
 }
@@ -375,132 +424,26 @@ body {
   box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
 }
 
-/* Enhanced button effects */
-.btn-glow {
-  position: relative;
-  overflow: hidden;
+/* Ensure proper contrast and visibility */
+.text-contrast {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-.btn-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+/* Modern focus states */
+.focus-modern:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
 
-.btn-glow:hover::before {
-  left: 100%;
-}
-
-/* Pure white text classes */
-.text-white-glow {
-  color: #ffffff !important;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.text-white-pure {
-  color: #ffffff !important;
-}
-
-/* Card hover effects */
-.card-hover {
-  transition: all 0.3s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(59, 130, 246, 0.3);
-}
-
-/* Animated border */
-.animated-border {
-  position: relative;
-  background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-  background-size: 200% 200%;
-  animation: borderShift 3s ease infinite;
-}
-
-@keyframes borderShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* Ensure all text elements are white by default */
-* {
-  color: #ffffff;
-}
-
-/* Override any remaining non-white text */
-.text-gray-500,
-.text-gray-400,
-.text-gray-600,
-.text-slate-500,
-.text-slate-400,
-.text-slate-600 {
-  color: #ffffff !important;
-}
-
-/* Fix specific UI components */
-.bg-white {
-  background-color: rgba(0, 0, 0, 0.8) !important;
-  color: #ffffff !important;
-}
-
-/* Ensure modal/dialog backgrounds are dark */
-[role="dialog"], .dialog-content {
-  background-color: rgba(15, 15, 15, 1) !important;
-  color: #ffffff !important;
-}
-
-/* Fix any remaining white backgrounds */
-.bg-background {
-  background-color: rgba(0, 0, 0, 1) !important;
-}
-
-.bg-card {
-  background-color: rgba(15, 15, 15, 1) !important;
-}
-
-.bg-muted {
-  background-color: rgba(25, 25, 25, 1) !important;
-}
-
-/* Ensure buttons with primary/accent backgrounds have black text */
-.bg-primary * {
-  color: #000000 !important;
-}
-
-.bg-accent * {
-  color: #000000 !important;
-}
-
-/* Fix any remaining visibility issues */
-.opacity-0 {
-  opacity: 0 !important;
-}
-
-.opacity-100 {
-  opacity: 1 !important;
-}
-
-/* Ensure proper contrast for all interactive elements */
-button:not(.bg-primary):not(.bg-accent) {
-  color: #ffffff !important;
-}
-
-a:not(.bg-primary):not(.bg-accent) {
-  color: #ffffff !important;
-}
-
-/* Fix form elements */
-.form-control, .form-input {
-  background-color: rgba(30, 30, 30, 1) !important;
-  color: #ffffff !important;
-  border-color: rgba(40, 40, 40, 1) !important;
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  body::before {
+    animation: none;
+  }
 }
