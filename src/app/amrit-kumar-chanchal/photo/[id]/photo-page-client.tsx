@@ -18,22 +18,94 @@ export function PhotoPageClient({ photo }: PhotoPageClientProps) {
 
   const formatDate = (date: Date | any) => {
     if (!date) return "Unknown";
-    const photoDate = date.toDate ? date.toDate() : new Date(date);
-    return photoDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    
+    try {
+      let photoDate: Date;
+      
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        photoDate = date.toDate();
+      }
+      // Handle Firestore Timestamp with seconds property
+      else if (date.seconds && typeof date.seconds === 'number') {
+        photoDate = new Date(date.seconds * 1000);
+      }
+      // Handle regular Date object
+      else if (date instanceof Date) {
+        photoDate = date;
+      }
+      // Handle date string
+      else if (typeof date === 'string') {
+        photoDate = new Date(date);
+      }
+      // Handle timestamp number
+      else if (typeof date === 'number') {
+        photoDate = new Date(date);
+      }
+      else {
+        return "Unknown";
+      }
+
+      // Check if date is valid
+      if (isNaN(photoDate.getTime())) {
+        return "Unknown";
+      }
+
+      return photoDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return "Unknown";
+    }
   };
 
   const formatTime = (date: Date | any) => {
     if (!date) return "Unknown";
-    const photoDate = date.toDate ? date.toDate() : new Date(date);
-    return photoDate.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+    
+    try {
+      let photoDate: Date;
+      
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        photoDate = date.toDate();
+      }
+      // Handle Firestore Timestamp with seconds property
+      else if (date.seconds && typeof date.seconds === 'number') {
+        photoDate = new Date(date.seconds * 1000);
+      }
+      // Handle regular Date object
+      else if (date instanceof Date) {
+        photoDate = date;
+      }
+      // Handle date string
+      else if (typeof date === 'string') {
+        photoDate = new Date(date);
+      }
+      // Handle timestamp number
+      else if (typeof date === 'number') {
+        photoDate = new Date(date);
+      }
+      else {
+        return "Unknown";
+      }
+
+      // Check if date is valid
+      if (isNaN(photoDate.getTime())) {
+        return "Unknown";
+      }
+
+      return photoDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return "Unknown";
+    }
   };
 
   const generateHashtags = (photo: Photo) => {
@@ -126,17 +198,20 @@ export function PhotoPageClient({ photo }: PhotoPageClientProps) {
 
   const hashtags = generateHashtags(photo);
 
+  // Use postingDate if available, otherwise fall back to createdAt
+  const displayDate = photo.postingDate || photo.createdAt;
+
   return (
     <>
       {/* Date and Time Information */}
       <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" />
-          <span>{formatDate(photo.createdAt)}</span>
+          <span>{formatDate(displayDate)}</span>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />
-          <span>{formatTime(photo.createdAt)}</span>
+          <span>{formatTime(displayDate)}</span>
         </div>
         {photo.location && (
           <div className="flex items-center gap-2">

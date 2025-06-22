@@ -107,14 +107,50 @@ export function PhotoDetailModal({ photo, isOpen, onClose }: PhotoDetailModalPro
 
   const formatDate = (date: Date | any) => {
     if (!date) return "Unknown";
-    const photoDate = date.toDate ? date.toDate() : new Date(date);
-    return photoDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    try {
+      let photoDate: Date;
+      
+      // Handle Firestore Timestamp
+      if (date.toDate && typeof date.toDate === 'function') {
+        photoDate = date.toDate();
+      }
+      // Handle Firestore Timestamp with seconds property
+      else if (date.seconds && typeof date.seconds === 'number') {
+        photoDate = new Date(date.seconds * 1000);
+      }
+      // Handle regular Date object
+      else if (date instanceof Date) {
+        photoDate = date;
+      }
+      // Handle date string
+      else if (typeof date === 'string') {
+        photoDate = new Date(date);
+      }
+      // Handle timestamp number
+      else if (typeof date === 'number') {
+        photoDate = new Date(date);
+      }
+      else {
+        return "Unknown";
+      }
+
+      // Check if date is valid
+      if (isNaN(photoDate.getTime())) {
+        return "Unknown";
+      }
+
+      return photoDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return "Unknown";
+    }
   };
 
   const CopyButton = ({ text, fieldName }: { text: string; fieldName: string }) => (
@@ -131,6 +167,9 @@ export function PhotoDetailModal({ photo, isOpen, onClose }: PhotoDetailModalPro
       )}
     </Button>
   );
+
+  // Use postingDate if available, otherwise fall back to createdAt
+  const displayDate = photo.postingDate || photo.createdAt;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

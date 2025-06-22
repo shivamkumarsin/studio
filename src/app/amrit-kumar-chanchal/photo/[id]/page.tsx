@@ -30,6 +30,48 @@ async function getPhotoData(id: string): Promise<Photo | null> {
   }
 }
 
+function formatDateForMetadata(date: Date | any): string {
+  if (!date) return new Date().toISOString();
+  
+  try {
+    let photoDate: Date;
+    
+    // Handle Firestore Timestamp
+    if (date.toDate && typeof date.toDate === 'function') {
+      photoDate = date.toDate();
+    }
+    // Handle Firestore Timestamp with seconds property
+    else if (date.seconds && typeof date.seconds === 'number') {
+      photoDate = new Date(date.seconds * 1000);
+    }
+    // Handle regular Date object
+    else if (date instanceof Date) {
+      photoDate = date;
+    }
+    // Handle date string
+    else if (typeof date === 'string') {
+      photoDate = new Date(date);
+    }
+    // Handle timestamp number
+    else if (typeof date === 'number') {
+      photoDate = new Date(date);
+    }
+    else {
+      return new Date().toISOString();
+    }
+
+    // Check if date is valid
+    if (isNaN(photoDate.getTime())) {
+      return new Date().toISOString();
+    }
+
+    return photoDate.toISOString();
+  } catch (error) {
+    console.error('Error formatting date for metadata:', error);
+    return new Date().toISOString();
+  }
+}
+
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
@@ -117,8 +159,8 @@ export async function generateMetadata(
       'og:image:height': '630',
       'og:image:type': 'image/jpeg',
       'article:author': 'Amrit Kumar Chanchal',
-      'article:published_time': photo.createdAt ? new Date(photo.createdAt.seconds * 1000).toISOString() : new Date().toISOString(),
-      'article:modified_time': photo.updatedAt ? new Date(photo.updatedAt.seconds * 1000).toISOString() : undefined,
+      'article:published_time': formatDateForMetadata(photo.createdAt),
+      'article:modified_time': photo.updatedAt ? formatDateForMetadata(photo.updatedAt) : undefined,
       'article:section': photo.category,
       'article:tag': photo.tags?.join(', ') || '',
     },
