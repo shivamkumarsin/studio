@@ -228,6 +228,47 @@ body {
   input::placeholder, textarea::placeholder {
     color: rgba(255, 255, 255, 0.6) !important;
   }
+
+  /* Photo Grid Specific Fixes */
+  .photo-grid-card {
+    background: rgba(15, 15, 15, 0.9) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  }
+
+  .photo-grid-card .card-title {
+    color: #ffffff !important;
+  }
+
+  .photo-grid-card .card-description {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .photo-grid-card .card-footer-text {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  /* Hover overlay badges - ensure dark background with white text */
+  .photo-overlay-badge {
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Heart button states */
+  .heart-button-liked {
+    color: #ef4444 !important; /* Red color for liked state */
+    background: rgba(239, 68, 68, 0.1) !important;
+  }
+
+  .heart-button-unliked {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .heart-button-unliked:hover {
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+  }
 }
 
 /* Background animation keyframes */
@@ -435,6 +476,18 @@ body {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
 
+/* Heart animation */
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.heart-liked {
+  animation: heartBeat 0.6s ease-in-out;
+  color: #ef4444 !important;
+}
+
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -444,6 +497,10 @@ body {
   }
   
   body::before {
+    animation: none;
+  }
+  
+  .heart-liked {
     animation: none;
   }
 }

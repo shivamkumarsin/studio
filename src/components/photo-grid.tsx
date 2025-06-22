@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PhotoDetailModal } from "./photo-detail-modal";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PhotoGridProps {
   photos: Photo[];
@@ -31,6 +32,8 @@ interface PhotoGridProps {
 export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [likedPhotos, setLikedPhotos] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
 
   const openDetailModal = (photo: Photo) => {
     setSelectedPhoto(photo);
@@ -40,6 +43,26 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
   const closeDetailModal = () => {
     setSelectedPhoto(null);
     setIsDetailModalOpen(false);
+  };
+
+  const toggleLike = (photoId: string, photoName: string) => {
+    setLikedPhotos(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(photoId)) {
+        newLiked.delete(photoId);
+        toast({
+          title: "Removed from favorites",
+          description: `"${photoName}" removed from your favorites`,
+        });
+      } else {
+        newLiked.add(photoId);
+        toast({
+          title: "Added to favorites",
+          description: `"${photoName}" added to your favorites`,
+        });
+      }
+      return newLiked;
+    });
   };
 
   if (photos.length === 0) {
@@ -117,7 +140,7 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                     <div className="flex gap-2">
                       <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
-                        <Button size="sm" className="bg-primary/90 hover:bg-primary text-primary-foreground rounded-full shadow-lg backdrop-blur-sm btn-modern">
+                        <Button size="sm" className="bg-primary/90 hover:bg-primary text-black rounded-full shadow-lg backdrop-blur-sm btn-modern">
                           <Eye className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -133,26 +156,49 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
                       >
                         <Info className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-full shadow-lg backdrop-blur-sm btn-modern">
-                        <Heart className="h-4 w-4" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className={`rounded-full shadow-lg backdrop-blur-sm btn-modern transition-all duration-300 ${
+                          likedPhotos.has(photo.id) 
+                            ? 'bg-red-500/90 border-red-400 text-white hover:bg-red-600/90' 
+                            : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleLike(photo.id, photo.name);
+                        }}
+                      >
+                        <Heart className={`h-4 w-4 transition-all duration-300 ${
+                          likedPhotos.has(photo.id) ? 'fill-current scale-110' : ''
+                        }`} />
                       </Button>
                     </div>
                   </div>
 
-                  {/* Category badge */}
+                  {/* Category badge - Fixed visibility */}
                   <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="flex items-center gap-1 px-2 py-1 bg-primary/90 text-primary-foreground rounded-full text-xs font-medium backdrop-blur-sm">
-                      <CategoryIcon category={photo.category} className="h-3 w-3" />
-                      <span>{photo.category}</span>
+                    <div className="flex items-center gap-1 px-2 py-1 bg-black/80 text-white rounded-full text-xs font-medium backdrop-blur-sm border border-white/20">
+                      <CategoryIcon category={photo.category} className="h-3 w-3 text-primary" />
+                      <span className="text-white">{photo.category}</span>
                     </div>
                   </div>
 
-                  {/* Updated indicator */}
+                  {/* Featured badge - Fixed visibility */}
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="flex items-center gap-1 px-2 py-1 bg-black/80 text-white rounded-full text-xs font-medium backdrop-blur-sm border border-white/20">
+                      <Eye className="h-3 w-3 text-accent" />
+                      <span className="text-white">View</span>
+                    </div>
+                  </div>
+
+                  {/* Updated indicator - Fixed visibility */}
                   {photo.updatedAt && (
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      <div className="flex items-center gap-1 px-2 py-1 bg-accent/90 text-accent-foreground rounded-full text-xs font-medium backdrop-blur-sm">
-                        <Edit className="h-3 w-3" />
-                        <span>Updated</span>
+                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-black/80 text-white rounded-full text-xs font-medium backdrop-blur-sm border border-white/20">
+                        <Edit className="h-3 w-3 text-green-400" />
+                        <span className="text-white">Updated</span>
                       </div>
                     </div>
                   )}
@@ -162,20 +208,20 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
               <CardContent className="p-4 flex-grow relative">
                 <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
                   <a className="block cursor-pointer">
-                    <CardTitle className="font-bold text-lg mb-2 truncate text-card-foreground group-hover:text-primary transition-colors duration-300" title={photo.name}>
+                    <CardTitle className="font-bold text-lg mb-2 truncate text-white group-hover:text-primary transition-colors duration-300" title={photo.name}>
                       {photo.name}
                     </CardTitle>
                   </a>
                 </Link>
                 
                 {photo.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                  <p className="text-sm text-white/80 line-clamp-2 mb-3">
                     {photo.description}
                   </p>
                 )}
 
                 {photo.location && (
-                  <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                  <p className="text-xs text-white/70 mb-2 flex items-center gap-1">
                     <span className="w-1 h-1 bg-primary rounded-full"></span>
                     {photo.location}
                   </p>
@@ -184,12 +230,12 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
                 {photo.tags && photo.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">
                     {photo.tags.slice(0, 3).map((tag, index) => (
-                      <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                      <span key={index} className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full border border-primary/30">
                         {tag}
                       </span>
                     ))}
                     {photo.tags.length > 3 && (
-                      <span className="text-xs text-muted-foreground">+{photo.tags.length - 3} more</span>
+                      <span className="text-xs text-white/70">+{photo.tags.length - 3} more</span>
                     )}
                   </div>
                 )}
@@ -198,7 +244,7 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
               <CardFooter className="p-4 pt-0 flex items-center justify-between relative">
                 <div className="flex items-center gap-2">
                   <CategoryIcon category={photo.category} className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-muted-foreground font-medium">{photo.category}</span>
+                  <span className="text-sm text-white/80 font-medium">{photo.category}</span>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -214,6 +260,28 @@ export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
                   >
                     <Info className="h-4 w-4" />
                     <span className="sr-only">View details for {photo.name}</span>
+                  </Button>
+
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleLike(photo.id, photo.name);
+                    }}
+                    className={`rounded-full transition-all duration-300 ${
+                      likedPhotos.has(photo.id) 
+                        ? 'text-red-500 hover:text-red-400 hover:bg-red-500/10' 
+                        : 'text-white/70 hover:text-red-500 hover:bg-red-500/10'
+                    }`}
+                  >
+                    <Heart className={`h-4 w-4 transition-all duration-300 ${
+                      likedPhotos.has(photo.id) ? 'fill-current scale-110' : ''
+                    }`} />
+                    <span className="sr-only">
+                      {likedPhotos.has(photo.id) ? 'Remove from favorites' : 'Add to favorites'} {photo.name}
+                    </span>
                   </Button>
 
                   {onEdit && (
