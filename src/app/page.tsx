@@ -148,7 +148,7 @@ export default function PublicHomePage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-primary">
-                  Amrit's Photo Album
+                  Amrit's Album
                 </h1>
                 <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
               </div>
@@ -266,34 +266,6 @@ export default function PublicHomePage() {
                 Browse through my carefully selected works below to experience life's beautiful moments frozen in time. 
                 Whether you're seeking inspiration or looking to collaborate, I invite you to immerse yourself in these visual narratives.
               </p>
-            </div>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="mb-12">
-            <div className="max-w-2xl mx-auto">
-              <h3 className="text-xl font-semibold text-primary mb-4">Featured Collections:</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  Timeless Portraits
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="w-2 h-2 bg-accent rounded-full"></span>
-                  Urban Landscapes
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  Artistic Expressions
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span className="w-2 h-2 bg-accent rounded-full"></span>
-                  Life in Motion
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2 justify-center">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  Nature's Canvas
-                </div>
-              </div>
             </div>
           </motion.div>
 
@@ -446,7 +418,7 @@ export default function PublicHomePage() {
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Welcome to my personal photo album. I'm Amrit, a passionate visual artist who believes 
+                  Welcome to my personal album. I'm Amrit, a passionate visual artist who believes 
                   in the power of photography to capture life's most precious moments and tell compelling stories.
                 </p>
                 <p>
@@ -572,7 +544,7 @@ export default function PublicHomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-primary">
-                  Amrit's Photo Album
+                  Amrit's Album
                 </h3>
                 <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
               </div>
@@ -580,7 +552,7 @@ export default function PublicHomePage() {
             
             <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
               A personal collection of life's beautiful moments captured through the lens. 
-              Each photo tells a story and preserves memories worth cherishing.
+              Each image tells a story and preserves memories worth cherishing.
             </p>
           </div>
           
@@ -608,7 +580,7 @@ export default function PublicHomePage() {
           <div className="text-center">
             <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-6"></div>
             <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Personal Photo Album.
+              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Personal Album.
             </p>
           </div>
         </div>
