@@ -237,8 +237,8 @@ export default function PublicHomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-accent/10"></div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div variants={itemVariants} className="mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-8 blue-glow">
+          <motion.div variants={itemVariants} className="mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-10 blue-glow">
               <GraduationCap className="h-4 w-4 text-primary" />
               <span className="text-sm text-muted-foreground">Tech Developer</span>
               <Sparkles className="h-4 w-4 text-accent" />
