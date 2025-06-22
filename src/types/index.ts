@@ -13,6 +13,32 @@ export interface Photo {
   tags?: string[]; // Array of tags/keywords
   postingDate?: Date; // When the post should be published
   updatedAt?: Timestamp; // When the post was last updated
+  
+  // Extended metadata for detailed view
+  metadata?: {
+    camera?: string;
+    lens?: string;
+    iso?: number;
+    aperture?: string;
+    shutterSpeed?: string;
+    focalLength?: string;
+    fileSize?: string;
+    dimensions?: string;
+    colorSpace?: string;
+    format?: string;
+    compression?: string;
+    bitDepth?: string;
+  };
+  
+  // Engagement metrics
+  engagement?: {
+    views?: number;
+    likes?: number;
+    comments?: number;
+    shares?: number;
+    downloads?: number;
+    impressions?: number;
+  };
 }
 
 export const APP_CATEGORIES = [
