@@ -41,7 +41,11 @@ function generateSuggestedFilename(originalName: string, title: string, location
   return `${authorName}-${cleanLocation}-${cleanTitle}.${extension}`;
 }
 
-export function PhotoUploadForm() {
+interface PhotoUploadFormProps {
+  onUploadSuccess?: () => void;
+}
+
+export function PhotoUploadForm({ onUploadSuccess }: PhotoUploadFormProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
@@ -158,7 +162,8 @@ export function PhotoUploadForm() {
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              // Progress tracking
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(((i) / totalFiles) * 100 + (progress / totalFiles));
             },
             (error) => {
               console.error(`Firebase Storage Upload Error for ${file.name}:`, error);
@@ -225,6 +230,11 @@ export function PhotoUploadForm() {
         title: "Upload Complete",
         description: `${successfulUploads} of ${totalFiles} photos uploaded successfully.`,
       });
+      
+      // Call success callback if provided
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
     } else if (totalFiles > 0) {
        toast({
         title: "Upload Failed",

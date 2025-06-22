@@ -113,11 +113,23 @@ export default function AdminPage() {
     );
     setCurrentView('overview');
     setEditingPhoto(null);
+    toast({
+      title: "Photo Updated",
+      description: `"${updatedPhoto.name}" has been updated successfully.`,
+    });
   };
 
   const handleEditCancel = () => {
     setCurrentView('overview');
     setEditingPhoto(null);
+  };
+
+  const handleUploadSuccess = () => {
+    setCurrentView('overview');
+    toast({
+      title: "Upload Successful",
+      description: "Your photo has been uploaded successfully.",
+    });
   };
 
   const handleTestFirebaseConnection = async () => {
@@ -181,7 +193,7 @@ export default function AdminPage() {
           <h1 className="text-2xl font-bold">Create New Post</h1>
         </div>
         <div className="flex justify-center">
-          <PhotoUploadForm />
+          <PhotoUploadForm onUploadSuccess={handleUploadSuccess} />
         </div>
       </div>
     );
