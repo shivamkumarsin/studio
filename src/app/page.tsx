@@ -19,7 +19,8 @@ import {
   Award,
   Menu,
   Grid3X3,
-  ArrowRight
+  ArrowRight,
+  Album
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, limit } from "firebase/firestore";
@@ -142,21 +143,21 @@ export default function PublicHomePage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-primary rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div className="relative bg-primary p-2 rounded-full blue-glow">
-                  <Camera className="h-6 w-6 text-black" />
+                  <Album className="h-6 w-6 text-black" />
                 </div>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-primary">
-                  PhotoStack Pro
+                  Amrit's Photo Album
                 </h1>
-                <p className="text-xs text-muted-foreground">Professional Photography</p>
+                <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
               </div>
             </Link>
             
             <nav className="hidden md:flex items-center gap-6">
               <Button 
                 variant="ghost" 
-                onClick={() => scrollToSection('weekly-highlights-section')} 
+                onClick={() => scrollToSection('featured-collections-section')} 
                 className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover"
               >
                 <Star className="mr-2 h-4 w-4" />
@@ -176,7 +177,7 @@ export default function PublicHomePage() {
                   className="text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 smooth-hover"
                 >
                   <Grid3X3 className="mr-2 h-4 w-4" />
-                  Categories
+                  Browse
                 </Button>
               </Link>
               <Link href="/contact">
@@ -233,8 +234,8 @@ export default function PublicHomePage() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div variants={itemVariants} className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
-              <Award className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Professional Photography</span>
+              <Album className="h-4 w-4 text-primary" />
+              <span className="text-sm text-muted-foreground">Welcome to My Visual Journey</span>
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
           </motion.div>
@@ -252,23 +253,58 @@ export default function PublicHomePage() {
               <Camera className="h-6 w-6 text-primary animate-pulse" />
               <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent flex-1 max-w-20"></div>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-muted-foreground mb-2">
-              Professional Photographer & Visual Artist
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-muted-foreground mb-6">
+              Visual Artist & Storyteller
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Specializing in capturing authentic moments and creating compelling visual narratives. 
-              Welcome to my professional photography portfolio showcasing diverse projects and artistic vision.
-            </p>
+            <div className="max-w-4xl mx-auto space-y-4 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                Explore a curated collection of authentic moments and compelling stories captured through my lens. 
+                From intimate portraits to breathtaking landscapes, each image in this gallery represents my passion 
+                for visual storytelling and artistic expression.
+              </p>
+              <p>
+                Browse through my carefully selected works below to experience life's beautiful moments frozen in time. 
+                Whether you're seeking inspiration or looking to collaborate, I invite you to immerse yourself in these visual narratives.
+              </p>
+            </div>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <motion.div variants={itemVariants} className="mb-12">
+            <div className="max-w-2xl mx-auto">
+              <h3 className="text-xl font-semibold text-primary mb-4">Featured Collections:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-2 h-2 bg-primary rounded-full"></span>
+                  Timeless Portraits
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-2 h-2 bg-accent rounded-full"></span>
+                  Urban Landscapes
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-2 h-2 bg-primary rounded-full"></span>
+                  Artistic Expressions
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="w-2 h-2 bg-accent rounded-full"></span>
+                  Life in Motion
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2 justify-center">
+                  <span className="w-2 h-2 bg-primary rounded-full"></span>
+                  Nature's Canvas
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 blue-glow btn-modern"
               onClick={() => scrollToSection('gallery-main-section')}
             >
               <Eye className="mr-2 h-5 w-5" />
-              View Portfolio
+              View Gallery
               <ChevronDown className="ml-2 h-5 w-5 animate-bounce" />
             </Button>
             
@@ -283,11 +319,17 @@ export default function PublicHomePage() {
             </Button>
           </motion.div>
 
+          <motion.div variants={itemVariants} className="text-center">
+            <p className="text-lg text-primary font-medium italic">
+              "Let these images speak their thousand words."
+            </p>
+          </motion.div>
+
           {/* Stats */}
           <motion.div variants={itemVariants} className="mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto">
             <div className="text-center glass p-4 rounded-lg">
               <div className="text-2xl font-bold text-primary">{photos.length}+</div>
-              <div className="text-sm text-muted-foreground">Projects</div>
+              <div className="text-sm text-muted-foreground">Photos</div>
             </div>
             <div className="text-center glass p-4 rounded-lg">
               <div className="text-2xl font-bold text-accent">30+</div>
@@ -295,7 +337,7 @@ export default function PublicHomePage() {
             </div>
             <div className="text-center glass p-4 rounded-lg">
               <div className="text-2xl font-bold text-primary">∞</div>
-              <div className="text-sm text-muted-foreground">Possibilities</div>
+              <div className="text-sm text-muted-foreground">Stories</div>
             </div>
           </motion.div>
         </div>
@@ -311,8 +353,8 @@ export default function PublicHomePage() {
         ></motion.div>
       </motion.section>
 
-      {/* Featured Work */}
-      <section id="weekly-highlights-section" className="py-20 md:py-32 relative scroll-mt-20">
+      {/* Featured Collections */}
+      <section id="featured-collections-section" className="py-20 md:py-32 relative scroll-mt-20">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent"></div>
         <div className="container mx-auto px-4 relative">
           <motion.div 
@@ -327,11 +369,11 @@ export default function PublicHomePage() {
               <span className="text-sm text-muted-foreground">Featured Collection</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-              Latest Work
+              Best Picks from My Gallery
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Showcasing my most recent photography projects and creative endeavors. 
-              Each image represents a unique story and artistic vision.
+              Showcasing some of my finest photography work shared across the internet. 
+              Each image represents a unique moment and artistic vision captured through my lens.
             </p>
           </motion.div>
 
@@ -347,7 +389,7 @@ export default function PublicHomePage() {
           ) : (
             <div className="text-center py-20">
               <Camera className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <p className="text-muted-foreground">New projects coming soon. Stay tuned for updates!</p>
+              <p className="text-muted-foreground">New collections coming soon. Stay tuned for updates!</p>
             </div>
           )}
         </div>
@@ -368,7 +410,7 @@ export default function PublicHomePage() {
               <span className="text-sm text-muted-foreground">About the Artist</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-              Professional Journey
+              My Creative Journey
             </h2>
           </motion.div>
 
@@ -384,14 +426,14 @@ export default function PublicHomePage() {
               <div className="relative glass rounded-3xl p-8 border border-primary/30 blue-glow card-modern">
                 <Image 
                   src={PROFILE_IMAGE_URL} 
-                  alt="Amrit Kumar Chanchal - Professional Photographer"
+                  alt="Amrit Kumar Chanchal - Visual Artist & Photographer"
                   width={400}
                   height={400}
                   className="rounded-2xl mx-auto object-cover aspect-square shadow-2xl"
                   sizes="(max-width: 768px) 80vw, 400px"
                 />
                 <div className="absolute -bottom-4 -right-4 bg-primary text-black p-3 rounded-full shadow-lg blue-glow">
-                  <Camera className="h-6 w-6" />
+                  <Album className="h-6 w-6" />
                 </div>
               </div>
             </div>
@@ -399,30 +441,30 @@ export default function PublicHomePage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-3xl font-bold text-foreground mb-2">Amrit Kumar Chanchal</h3>
-                <p className="text-primary font-semibold">Professional Photographer & Creative Director</p>
+                <p className="text-primary font-semibold">Visual Artist & Creative Storyteller</p>
               </div>
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Welcome to my professional photography portfolio. I'm Amrit, a dedicated photographer 
-                  with a passion for creating compelling visual narratives that resonate with audiences.
+                  Welcome to my personal photo album. I'm Amrit, a passionate visual artist who believes 
+                  in the power of photography to capture life's most precious moments and tell compelling stories.
                 </p>
                 <p>
-                  My expertise spans multiple photography disciplines, from corporate portraits to 
-                  creative projects. I believe in the power of photography to tell stories, 
-                  capture emotions, and preserve important moments.
+                  Through my lens, I explore the beauty in everyday moments, the emotions in human connections, 
+                  and the artistry in natural landscapes. Each photograph in this collection represents a piece 
+                  of my journey and a story waiting to be discovered.
                 </p>
                 <p>
-                  This portfolio showcases my commitment to excellence in visual storytelling, 
-                  technical proficiency, and artistic vision. Each project represents a collaborative 
-                  effort to bring ideas to life through the lens.
+                  This album showcases my favorite captures - from spontaneous street photography to carefully 
+                  composed portraits. I hope these images inspire you and perhaps remind you of your own 
+                  beautiful moments worth preserving.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Portrait Photography</span>
-                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Commercial Work</span>
-                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Event Coverage</span>
+                <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Street Photography</span>
+                <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm border border-primary/30">Nature & Landscapes</span>
                 <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm border border-accent/30">Creative Projects</span>
               </div>
 
@@ -433,7 +475,7 @@ export default function PublicHomePage() {
                   className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow btn-modern"
                 >
                   <Eye className="mr-2 h-5 w-5" />
-                  View Portfolio
+                  View Album
                 </Button>
                 <Link href="/categories">
                   <Button
@@ -442,7 +484,7 @@ export default function PublicHomePage() {
                     className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover btn-modern"
                   >
                     <Grid3X3 className="mr-2 h-5 w-5" />
-                    Browse Categories
+                    Browse Collections
                   </Button>
                 </Link>
               </div>
@@ -451,7 +493,7 @@ export default function PublicHomePage() {
         </div>
       </section>
       
-      {/* Recent Work Section */}
+      {/* Recent Photos Section */}
       <main id="gallery-main-section" className="py-20 md:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent"></div>
         <div className="container mx-auto px-4 relative">
@@ -464,14 +506,14 @@ export default function PublicHomePage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <Images className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Recent Work</span>
+              <span className="text-sm text-muted-foreground">Recent Additions</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 clean-headline">
-              Latest Photography
+              Latest Photos
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Explore my most recent photography work. Each image tells a story and showcases 
-              different aspects of my professional practice and creative vision.
+              Discover my most recent captures and additions to the album. Each photo tells a story 
+              and showcases different moments from my ongoing visual journey.
             </p>
             
             <Link href="/categories">
@@ -481,7 +523,7 @@ export default function PublicHomePage() {
                 className="border-primary text-primary hover:bg-primary hover:text-black rounded-full transition-all duration-300 blue-glow-hover btn-modern"
               >
                 <Grid3X3 className="mr-2 h-5 w-5" />
-                Browse All Categories
+                Browse All Collections
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -491,7 +533,7 @@ export default function PublicHomePage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3">
                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xl text-muted-foreground">Loading recent work...</p>
+                <p className="text-xl text-muted-foreground">Loading recent photos...</p>
               </div>
             </div>
           ) : (
@@ -505,7 +547,7 @@ export default function PublicHomePage() {
                       className="bg-primary hover:bg-primary/90 text-black rounded-full transition-all duration-300 blue-glow btn-modern"
                     >
                       <Grid3X3 className="mr-2 h-5 w-5" />
-                      View All Work
+                      View Complete Album
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -525,20 +567,20 @@ export default function PublicHomePage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-primary rounded-full blur-md opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div className="relative bg-primary p-2 rounded-full blue-glow">
-                  <Camera className="h-6 w-6 text-black" />
+                  <Album className="h-6 w-6 text-black" />
                 </div>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-primary">
-                  PhotoStack Pro
+                  Amrit's Photo Album
                 </h3>
-                <p className="text-xs text-muted-foreground">Professional Photography</p>
+                <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
               </div>
             </Link>
             
             <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
-              Professional photography services specializing in visual storytelling and creative excellence. 
-              Bringing your vision to life through the art of photography.
+              A personal collection of life's beautiful moments captured through the lens. 
+              Each photo tells a story and preserves memories worth cherishing.
             </p>
           </div>
           
@@ -546,14 +588,14 @@ export default function PublicHomePage() {
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('hero-section')}>
               Home
             </Button>
-            <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('weekly-highlights-section')}>
-              Featured Work
+            <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('featured-collections-section')}>
+              Featured
             </Button>
             <Button variant="link" className="text-muted-foreground hover:text-primary p-0" onClick={() => scrollToSection('about-me-section')}>
               About
             </Button>
             <Link href="/categories" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-              Categories
+              Collections
             </Link>
             <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
               Contact
@@ -566,7 +608,7 @@ export default function PublicHomePage() {
           <div className="text-center">
             <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-6"></div>
             <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Professional Photography Services.
+              &copy; {new Date().getFullYear()} Amrit Kumar Chanchal. All rights reserved. Personal Photo Album.
             </p>
           </div>
         </div>
