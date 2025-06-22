@@ -29,6 +29,7 @@ export default function AdminPage() {
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [currentView, setCurrentView] = useState<AdminView>('overview');
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
 
   const ADMIN_EMAIL = 'amritkumarchanchal@gmail.com';
 
@@ -68,11 +69,22 @@ export default function AdminPage() {
   }, [user, toast, ADMIN_EMAIL]);
 
   const handlePhotoDelete = async (photoId: string) => {
+    // Check authorization first
     if (user?.email !== ADMIN_EMAIL) {
       toast({ 
         title: "Unauthorized", 
         description: "You cannot delete photos.", 
         variant: "destructive" 
+      });
+      return;
+    }
+
+    // Prevent multiple simultaneous deletions
+    if (deletingPhotoId) {
+      toast({
+        title: "Please wait",
+        description: "Another photo is currently being deleted.",
+        variant: "destructive",
       });
       return;
     }
@@ -87,45 +99,91 @@ export default function AdminPage() {
       return;
     }
 
+    setDeletingPhotoId(photoId);
+
     try {
-      console.log(`Attempting to delete photo: ${photoId}`);
+      console.log(`Starting deletion process for photo: ${photoId}`);
+      console.log(`Photo details:`, photoToDelete);
       
-      // First, delete from Firestore
+      // Show loading toast
+      toast({
+        title: "Deleting Photo",
+        description: `Removing "${photoToDelete.name}"...`,
+      });
+
+      // Step 1: Delete from Firestore first
+      console.log(`Deleting from Firestore: ${photoId}`);
       await deleteDoc(doc(db, "photos", photoId));
       console.log(`Successfully deleted photo from Firestore: ${photoId}`);
       
-      // Then, delete from Firebase Storage if it's a Firebase Storage URL
+      // Step 2: Delete from Firebase Storage if it's a Firebase Storage URL
       if (photoToDelete.src && photoToDelete.src.includes("firebasestorage.googleapis.com")) {
         try {
+          console.log(`Attempting to delete file from storage: ${photoToDelete.src}`);
+          
           const storage = getStorage();
           
-          // Extract the file path from the Firebase Storage URL
-          const url = new URL(photoToDelete.src);
-          const pathMatch = url.pathname.match(/\/o\/(.+)\?/);
+          // Method 1: Try to extract file path from URL
+          let filePath = null;
           
-          if (pathMatch) {
-            const filePath = decodeURIComponent(pathMatch[1]);
-            console.log(`Attempting to delete file from storage: ${filePath}`);
+          try {
+            const url = new URL(photoToDelete.src);
+            const pathMatch = url.pathname.match(/\/o\/(.+)\?/);
             
+            if (pathMatch) {
+              filePath = decodeURIComponent(pathMatch[1]);
+              console.log(`Extracted file path: ${filePath}`);
+            }
+          } catch (urlError) {
+            console.error("Error parsing URL:", urlError);
+          }
+          
+          // Method 2: If path extraction failed, try common patterns
+          if (!filePath) {
+            // Try to extract filename from URL
+            const urlParts = photoToDelete.src.split('/');
+            const filenamePart = urlParts[urlParts.length - 1];
+            if (filenamePart && filenamePart.includes('?')) {
+              const filename = filenamePart.split('?')[0];
+              filePath = `photos/${filename}`;
+              console.log(`Using fallback file path: ${filePath}`);
+            }
+          }
+          
+          // Method 3: Try direct reference if we have a path
+          if (filePath) {
             const photoRef = ref(storage, filePath);
             await deleteObject(photoRef);
             console.log(`Successfully deleted file from storage: ${filePath}`);
           } else {
-            console.warn("Could not extract file path from URL:", photoToDelete.src);
+            console.warn("Could not determine file path for storage deletion");
+            // Don't fail the entire operation if we can't delete from storage
           }
+          
         } catch (storageError) {
           console.error("Error deleting from storage (but Firestore deletion succeeded):", storageError);
-          // Don't fail the entire operation if storage deletion fails
+          
+          // Show warning but don't fail the operation
+          toast({
+            title: "Partial Success",
+            description: "Photo removed from database, but file may still exist in storage.",
+            variant: "default",
+          });
         }
+      } else {
+        console.log("Photo is not stored in Firebase Storage, skipping storage deletion");
       }
       
+      // Step 3: Update local state immediately for better UX
+      setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== photoId));
+      
+      // Step 4: Show success message
       toast({
         title: "Photo Deleted Successfully",
         description: `"${photoToDelete.name}" has been removed from your collection.`,
       });
 
-      // Update local state to remove the deleted photo immediately
-      setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== photoId));
+      console.log(`Deletion process completed for photo: ${photoId}`);
       
     } catch (error) {
       console.error("Error deleting photo:", error);
@@ -140,6 +198,8 @@ export default function AdminPage() {
           errorMessage = "Photo not found in database.";
         } else if (error.message.includes("network")) {
           errorMessage = "Network error. Check your internet connection.";
+        } else if (error.message.includes("offline")) {
+          errorMessage = "You appear to be offline. Please check your connection.";
         }
       }
       
@@ -148,6 +208,12 @@ export default function AdminPage() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      // If Firestore deletion failed, we don't need to update local state
+      // The real-time listener will handle any actual changes
+      
+    } finally {
+      setDeletingPhotoId(null);
     }
   };
 
