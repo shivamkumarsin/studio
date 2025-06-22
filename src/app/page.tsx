@@ -51,7 +51,8 @@ export default function PublicHomePage() {
   useEffect(() => {
     setIsLoading(true);
     const photosCollection = collection(db, "photos");
-    const q = query(photosCollection, orderBy("createdAt", "desc"), limit(12)); // Limit to 12 for home page
+    // BANDWIDTH OPTIMIZATION: Limit home page to 12 recent photos
+    const q = query(photosCollection, orderBy("createdAt", "desc"), limit(12));
 
     const unsubscribePhotos = onSnapshot(q, (querySnapshot) => {
       const photosData: Photo[] = [];
@@ -71,6 +72,7 @@ export default function PublicHomePage() {
     });
 
     setIsLoadingHighlights(true);
+    // BANDWIDTH OPTIMIZATION: Only 3 highlights
     const highlightsQuery = query(photosCollection, orderBy("createdAt", "desc"), limit(3));
     const unsubscribeHighlights = onSnapshot(highlightsQuery, (querySnapshot) => {
       const highlightsData: Photo[] = [];
