@@ -237,22 +237,22 @@ export default function PublicHomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-accent/10"></div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
-          {/* Tech Developer Badge - Positioned after header */}
-          <motion.div variants={itemVariants} className="mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 blue-glow">
-              <GraduationCap className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Tech Developer</span>
-              <Sparkles className="h-4 w-4 text-accent" />
-            </div>
-          </motion.div>
-
           {/* Main Name */}
           <motion.h1
             variants={itemVariants}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 clean-headline"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-8 clean-headline"
           >
             Amrit Kumar Chanchal
           </motion.h1>
+
+          {/* Tech Developer Badge - Positioned after name with more space */}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass border border-primary/30 blue-glow">
+              <GraduationCap className="h-5 w-5 text-primary" />
+              <span className="text-base font-medium text-muted-foreground">Tech Developer</span>
+              <Sparkles className="h-5 w-5 text-accent" />
+            </div>
+          </motion.div>
 
           <motion.div variants={itemVariants} className="mb-8">
             <div className="flex items-center justify-center gap-4 mb-4">
