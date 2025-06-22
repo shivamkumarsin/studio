@@ -1,4 +1,3 @@
-
 import type { Timestamp } from 'firebase/firestore';
 
 export interface Photo {
@@ -8,6 +7,11 @@ export interface Photo {
   category: string;
   description?: string; // Optional description for the photo
   createdAt?: Timestamp; // For ordering
+  altText?: string; // Alt text for accessibility
+  caption?: string; // Brief description/caption
+  location?: string; // Where the photo was taken
+  tags?: string[]; // Array of tags/keywords
+  postingDate?: Date; // When the post should be published
 }
 
 export const APP_CATEGORIES = [
