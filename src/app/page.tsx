@@ -155,7 +155,7 @@ export default function PublicHomePage() {
                 <h1 className="text-xl font-bold text-primary">
                   Amrit's Album
                 </h1>
-                <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
+                <p className="text-xs text-muted-foreground">Visual Collection</p>
               </div>
             </Link>
             
@@ -240,7 +240,7 @@ export default function PublicHomePage() {
           <motion.div variants={itemVariants} className="mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 mb-6 blue-glow">
               <GraduationCap className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">IIT Madras | Web Developer | Freelancer | Data Science</span>
+              <span className="text-sm text-muted-foreground">Tech Developer</span>
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
           </motion.div>
@@ -552,7 +552,7 @@ export default function PublicHomePage() {
                 <h3 className="text-xl font-bold text-primary">
                   Amrit's Album
                 </h3>
-                <p className="text-xs text-muted-foreground">Visual Journey Collection</p>
+                <p className="text-xs text-muted-foreground">Visual Collection</p>
               </div>
             </Link>
             
