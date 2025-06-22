@@ -1,21 +1,23 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { PhotoUploadForm } from "@/components/photo-upload-form";
+import { PhotoEditForm } from "@/components/photo-edit-form";
 import { CategoryFilter } from "@/components/category-filter";
 import { PhotoGrid } from "@/components/photo-grid";
 import type { Photo, Category } from "@/types";
 import { ALL_CATEGORIES_OPTION } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, ShieldAlert } from "lucide-react";
+import { Wifi, WifiOff, ShieldAlert, Plus, Edit, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc, getCountFromServer } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { useAuth } from "@/contexts/auth-context";
+
+type AdminView = 'overview' | 'upload' | 'edit';
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
@@ -25,6 +27,8 @@ export default function AdminPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | typeof ALL_CATEGORIES_OPTION>(ALL_CATEGORIES_OPTION);
   const { toast } = useToast();
   const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [currentView, setCurrentView] = useState<AdminView>('overview');
+  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
 
   const ADMIN_EMAIL = 'amritkumarchanchal@gmail.com';
 
@@ -58,10 +62,9 @@ export default function AdminPage() {
       });
       return () => unsubscribe();
     } else if (user && user.email !== ADMIN_EMAIL) {
-      setIsLoadingPhotos(false); // Stop loading if not authorized
+      setIsLoadingPhotos(false);
     }
   }, [user, toast, ADMIN_EMAIL]);
-
 
   const handlePhotoDelete = async (photoId: string) => {
     if (user?.email !== ADMIN_EMAIL) {
@@ -95,6 +98,26 @@ export default function AdminPage() {
         variant: "destructive",
       });
     }
+  };
+
+  const handlePhotoEdit = (photo: Photo) => {
+    setEditingPhoto(photo);
+    setCurrentView('edit');
+  };
+
+  const handleEditSave = (updatedPhoto: Photo) => {
+    setPhotos(prevPhotos => 
+      prevPhotos.map(photo => 
+        photo.id === updatedPhoto.id ? updatedPhoto : photo
+      )
+    );
+    setCurrentView('overview');
+    setEditingPhoto(null);
+  };
+
+  const handleEditCancel = () => {
+    setCurrentView('overview');
+    setEditingPhoto(null);
   };
 
   const handleTestFirebaseConnection = async () => {
@@ -142,50 +165,176 @@ export default function AdminPage() {
       ? photos
       : photos.filter((photo) => photo.category === selectedCategory);
 
+  // Render different views based on currentView state
+  if (currentView === 'upload') {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setCurrentView('overview')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Overview
+          </Button>
+          <h1 className="text-2xl font-bold">Create New Post</h1>
+        </div>
+        <div className="flex justify-center">
+          <PhotoUploadForm />
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'edit' && editingPhoto) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={handleEditCancel}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Overview
+          </Button>
+          <h1 className="text-2xl font-bold">Edit Post: {editingPhoto.name}</h1>
+        </div>
+        <div className="flex justify-center">
+          <PhotoEditForm 
+            photo={editingPhoto}
+            onSave={handleEditSave}
+            onCancel={handleEditCancel}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Default overview view
   return (
     <div className="space-y-12">
-      <div className="grid md:grid-cols-3 gap-8">
-        <section aria-labelledby="upload-section-title" className="md:col-span-1">
-          <div className="sticky top-24"> 
-            <h2 id="upload-section-title" className="sr-only">Upload Photos</h2>
-            <PhotoUploadForm />
+      {/* Header with action buttons */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Manage your photo collection and posts</p>
+        </div>
+        <Button 
+          onClick={() => setCurrentView('upload')}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2"
+        >
+          <Plus className="h-5 w-5" />
+          Create New Post
+        </Button>
+      </div>
+
+      <div className="grid md:grid-cols-4 gap-8">
+        {/* Sidebar with controls */}
+        <section className="md:col-span-1 space-y-6">
+          <div className="sticky top-24">
+            {/* Firebase Status */}
+            <div className="p-4 border rounded-lg shadow-sm bg-card mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-card-foreground">System Status</h3>
+              <Button 
+                onClick={handleTestFirebaseConnection} 
+                disabled={isTestingConnection} 
+                variant="outline" 
+                className="w-full"
+              >
+                {isTestingConnection ? (
+                  <>
+                    <WifiOff className="mr-2 h-4 w-4 animate-pulse" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <Wifi className="mr-2 h-4 w-4" />
+                    Test Connection
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                Verify Firebase connectivity and permissions.
+              </p>
+            </div>
+
+            {/* Statistics */}
+            <div className="p-4 border rounded-lg shadow-sm bg-card mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-card-foreground">Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Total Photos:</span>
+                  <span className="font-semibold">{photos.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Filtered:</span>
+                  <span className="font-semibold">{filteredPhotos.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Updated Today:</span>
+                  <span className="font-semibold">
+                    {photos.filter(photo => {
+                      if (!photo.updatedAt) return false;
+                      const today = new Date();
+                      const photoDate = photo.updatedAt.toDate ? photo.updatedAt.toDate() : new Date(photo.updatedAt);
+                      return photoDate.toDateString() === today.toDateString();
+                    }).length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="p-4 border rounded-lg shadow-sm bg-card">
+              <h3 className="text-lg font-semibold mb-4 text-card-foreground">Filter by Category</h3>
+              <CategoryFilter
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+              />
+            </div>
           </div>
         </section>
 
-        <section aria-labelledby="gallery-section-title" className="md:col-span-2">
-          <h2 id="gallery-section-title" className="sr-only">Photo Gallery Management</h2>
-          
-          <div className="mb-6 p-4 border rounded-lg shadow-sm bg-card">
-            <h3 className="text-lg font-semibold mb-2 text-card-foreground">Firebase Status</h3>
-            <Button onClick={handleTestFirebaseConnection} disabled={isTestingConnection} variant="outline" className="w-full sm:w-auto">
-              {isTestingConnection ? (
-                <>
-                  <WifiOff className="mr-2 h-4 w-4 animate-pulse" />
-                  Testing Connection...
-                </>
-              ) : (
-                <>
-                  <Wifi className="mr-2 h-4 w-4" />
-                  Test Firebase Connection
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-muted-foreground mt-2">
-              Click this button to perform a quick check if the application can connect to your Firebase Firestore database.
-            </p>
+        {/* Main content area */}
+        <section className="md:col-span-3">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">
+                {selectedCategory === ALL_CATEGORIES_OPTION 
+                  ? `All Photos (${filteredPhotos.length})` 
+                  : `${selectedCategory} (${filteredPhotos.length})`
+                }
+              </h2>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setCurrentView('upload')}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Photo
+                </Button>
+              </div>
+            </div>
+            <Separator />
           </div>
           
-          <CategoryFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
-          <Separator className="my-6" />
           {isLoadingPhotos ? (
-            <div className="text-center py-10">
-              <p className="text-xl font-body text-muted-foreground">Loading photos from Firebase...</p>
+            <div className="text-center py-20">
+              <div className="inline-flex items-center gap-3">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xl text-muted-foreground">Loading photos from Firebase...</p>
+              </div>
             </div>
           ) : (
-             <PhotoGrid photos={filteredPhotos} onDelete={handlePhotoDelete} />
+            <PhotoGrid 
+              photos={filteredPhotos} 
+              onDelete={handlePhotoDelete}
+              onEdit={handlePhotoEdit}
+            />
           )}
         </section>
       </div>

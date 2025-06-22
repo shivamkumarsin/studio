@@ -447,7 +447,7 @@ export function PhotoUploadForm() {
                 <SelectTrigger id="category-select" className="w-full font-body">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   {APP_CATEGORIES.map((category) => (
                     <SelectItem key={category} value={category} className="font-body">
                       {category}

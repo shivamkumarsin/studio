@@ -7,7 +7,7 @@ import type { Photo } from "@/types";
 import { CategoryIcon } from "./icons/category-icon";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Trash2, Image as ImageIconPlaceholder, Eye, Heart, Zap } from "lucide-react";
+import { Trash2, Image as ImageIconPlaceholder, Eye, Heart, Zap, Edit } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,9 +23,10 @@ import {
 interface PhotoGridProps {
   photos: Photo[];
   onDelete?: (photoId: string) => void;
+  onEdit?: (photo: Photo) => void;
 }
 
-export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
+export function PhotoGrid({ photos, onDelete, onEdit }: PhotoGridProps) {
   if (photos.length === 0) {
     return (
       <motion.div 
@@ -89,7 +90,7 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                   <div className="aspect-square relative w-full overflow-hidden rounded-t-lg">
                     <Image
                       src={photo.src}
-                      alt={`${photo.name} - Photo by Amrit Kumar Chanchal`}
+                      alt={photo.altText || `${photo.name} - Photo by Amrit Kumar Chanchal`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="transition-all duration-700 ease-out group-hover:scale-110 object-cover"
@@ -117,6 +118,16 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                         <span>{photo.category}</span>
                       </div>
                     </div>
+
+                    {/* Updated indicator */}
+                    {photo.updatedAt && (
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="flex items-center gap-1 px-2 py-1 bg-accent/90 text-accent-foreground rounded-full text-xs font-medium backdrop-blur-sm">
+                          <Edit className="h-3 w-3" />
+                          <span>Updated</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardHeader>
               </a>
@@ -136,6 +147,26 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                   {photo.description}
                 </p>
               )}
+
+              {photo.location && (
+                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                  <span className="w-1 h-1 bg-primary rounded-full"></span>
+                  {photo.location}
+                </p>
+              )}
+
+              {photo.tags && photo.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {photo.tags.slice(0, 3).map((tag, index) => (
+                    <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                  {photo.tags.length > 3 && (
+                    <span className="text-xs text-muted-foreground">+{photo.tags.length - 3} more</span>
+                  )}
+                </div>
+              )}
             </CardContent>
 
             <CardFooter className="p-4 pt-0 flex items-center justify-between relative">
@@ -144,49 +175,71 @@ export function PhotoGrid({ photos, onDelete }: PhotoGridProps) {
                 <span className="text-sm text-muted-foreground font-medium">{photo.category}</span>
               </div>
 
-              {onDelete ? (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-full"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete photo {photo.name}</span>
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="glass border border-primary/20">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-muted-foreground">
-                        This action cannot be undone. This will permanently delete the photo
-                        "{photo.name}".
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="border-primary/20 hover:bg-primary/10">Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                        onClick={() => onDelete(photo.id)}
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              ) : (
-                <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
+              <div className="flex items-center gap-1">
+                {onEdit && (
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full" 
-                    aria-label={`View photo ${photo.name}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onEdit(photo);
+                    }}
+                    className="text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit photo {photo.name}</span>
                   </Button>
-                </Link>
-              )}
+                )}
+
+                {onDelete ? (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        className="text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-full"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete photo {photo.name}</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="glass border border-primary/20">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-muted-foreground">
+                          This action cannot be undone. This will permanently delete the photo
+                          "{photo.name}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="border-primary/20 hover:bg-primary/10">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                          onClick={() => onDelete(photo.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ) : (
+                  <Link href={`/amrit-kumar-chanchal/photo/${photo.id}`} passHref legacyBehavior>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full" 
+                      aria-label={`View photo ${photo.name}`}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </CardFooter>
           </Card>
         </motion.div>

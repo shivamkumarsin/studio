@@ -12,6 +12,7 @@ export interface Photo {
   location?: string; // Where the photo was taken
   tags?: string[]; // Array of tags/keywords
   postingDate?: Date; // When the post should be published
+  updatedAt?: Timestamp; // When the post was last updated
 }
 
 export const APP_CATEGORIES = [
@@ -21,6 +22,30 @@ export const APP_CATEGORIES = [
   "School",
   "Friends",
   "College Friends",
+  "Travel",
+  "Nature",
+  "Portrait",
+  "Street Photography",
+  "Architecture",
+  "Food",
+  "Events",
+  "Wedding",
+  "Family",
+  "Sports",
+  "Landscape",
+  "Wildlife",
+  "Fashion",
+  "Art",
+  "Technology",
+  "Business",
+  "Lifestyle",
+  "Documentary",
+  "Abstract",
+  "Black & White",
+  "Macro",
+  "Night Photography",
+  "Aerial",
+  "Underwater"
 ] as const;
 
 export type Category = typeof APP_CATEGORIES[number];
